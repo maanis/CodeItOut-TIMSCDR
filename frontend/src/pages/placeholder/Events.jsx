@@ -60,16 +60,29 @@ const Events = () => {
             {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {Array.from({ length: 6 }).map((_, index) => (
-                        <Card key={index} className="glass-card shadow-card">
-                            <CardHeader>
-                                <Skeleton className="h-6 w-3/4 mb-2" />
-                                <Skeleton className="h-4 w-1/2" />
-                            </CardHeader>
-                            <CardContent>
-                                <Skeleton className="h-16 w-full mb-4" />
-                                <Skeleton className="h-4 w-2/3" />
-                            </CardContent>
-                        </Card>
+                        <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 }}
+                            className="glass-card shadow-card p-6 rounded-xl h-full"
+                        >
+                            <div className="flex items-start justify-between mb-4">
+                                <div className="flex-1 space-y-2">
+                                    <div className="h-6 bg-muted rounded animate-pulse"></div>
+                                    <div className="h-4 bg-muted rounded w-1/2 animate-pulse"></div>
+                                </div>
+                                <div className="h-6 bg-muted rounded w-16 animate-pulse"></div>
+                            </div>
+                            <div className="space-y-2">
+                                <div className="h-4 bg-muted rounded animate-pulse"></div>
+                                <div className="h-4 bg-muted rounded w-3/4 animate-pulse"></div>
+                            </div>
+                            <div className="flex items-center justify-between mt-4">
+                                <div className="h-4 bg-muted rounded w-16 animate-pulse"></div>
+                                <div className="h-4 bg-muted rounded w-20 animate-pulse"></div>
+                            </div>
+                        </motion.div>
                     ))}
                 </div>
             ) : error ? (

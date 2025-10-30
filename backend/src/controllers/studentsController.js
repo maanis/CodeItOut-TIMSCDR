@@ -1,4 +1,5 @@
 const Student = require('../models/Student');
+const Notification = require('../models/Notification');
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
@@ -414,6 +415,17 @@ const addToCommunity = async (req, res) => {
             return res.status(404).json({ error: 'Student not found' });
         }
 
+        // Create notification for community addition
+        try {
+            await Notification.create({
+                content: 'Welcome! You have been added to the coding community.',
+                userId: id,
+                type: 'system'
+            });
+        } catch (notificationError) {
+            console.error('Error creating community addition notification:', notificationError);
+        }
+
         res.json({
             message: 'Student added to community successfully',
             student: {
@@ -442,6 +454,17 @@ const removeFromCommunity = async (req, res) => {
 
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
+        }
+
+        // Create notification for community removal
+        try {
+            await Notification.create({
+                content: 'You have been removed from the coding community.',
+                userId: id,
+                type: 'system'
+            });
+        } catch (notificationError) {
+            console.error('Error creating community removal notification:', notificationError);
         }
 
         res.json({

@@ -1,4 +1,5 @@
 const Project = require('../models/Project');
+const Notification = require('../models/Notification');
 
 // @desc    Create a new project
 // @route   POST /api/projects
@@ -158,12 +159,34 @@ const updateProject = async (req, res) => {
                         project.student,
                         { $addToSet: { approvedProjects: project._id } }
                     );
+
+                    // Create notification for project approval
+                    try {
+                        await Notification.create({
+                            content: `Your project "${project.title}" has been approved!`,
+                            userId: project.student,
+                            type: 'project'
+                        });
+                    } catch (notificationError) {
+                        console.error('Error creating approval notification:', notificationError);
+                    }
                 } else {
                     // Remove project from student's approvedProjects
                     await Student.findByIdAndUpdate(
                         project.student,
                         { $pull: { approvedProjects: project._id } }
                     );
+
+                    // Create notification for project rejection
+                    try {
+                        await Notification.create({
+                            content: `Your project "${project.title}" has been rejected.`,
+                            userId: project.student,
+                            type: 'project'
+                        });
+                    } catch (notificationError) {
+                        console.error('Error creating rejection notification:', notificationError);
+                    }
                 }
             }
         }

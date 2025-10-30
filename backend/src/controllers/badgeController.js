@@ -1,5 +1,6 @@
 const Badge = require('../models/Badge');
 const Student = require('../models/Student');
+const Notification = require('../models/Notification');
 
 // @desc    Create a new badge
 // @route   POST /api/badges
@@ -198,6 +199,17 @@ const assignBadgeToStudent = async (req, res) => {
             studentId,
             { $addToSet: { badges: badgeId } }
         );
+
+        // Create notification for badge assignment
+        try {
+            await Notification.create({
+                content: `Congratulations! You have been awarded the "${badge.name}" badge (${badge.points} points)!`,
+                userId: studentId,
+                type: 'badge'
+            });
+        } catch (notificationError) {
+            console.error('Error creating badge notification:', notificationError);
+        }
 
         res.json({
             message: `Badge "${badge.name}" assigned to ${student.name} successfully`

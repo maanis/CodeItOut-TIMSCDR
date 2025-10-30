@@ -12,6 +12,7 @@ const announcementRoutes = require('./routes/announcementRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const badgeRoutes = require('./routes/badgeRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/announcements', announcementRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/badges', badgeRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Connect to DB
 connectDB();

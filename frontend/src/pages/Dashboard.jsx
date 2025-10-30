@@ -11,6 +11,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useAnnouncements } from '@/hooks/useAnnouncements';
 import { useEvents } from '@/hooks/useEvents';
 import { useMyProjects } from '@/hooks/useProjects';
+import { useNotifications } from '@/hooks/useNotifications';
 
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
@@ -23,12 +24,6 @@ import { useState, useRef, useEffect } from 'react';
 //     { rank: 5, name: 'David Lee', points: 2100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David' },
 // ];
 
-const mockNotifications = [
-    { id: 1, text: 'New event: React Workshop starting in 2 days', time: '5m ago', unread: true },
-    { id: 2, text: 'You earned a new badge: Code Warrior', time: '1h ago', unread: true },
-    { id: 3, text: 'Project submission deadline: Tomorrow', time: '3h ago', unread: false },
-];
-
 const mockProjects = [
     { id: 1, title: 'E-commerce Website', status: 'Submitted', score: 95 },
     { id: 2, title: 'Weather App', status: 'In Review', score: null },
@@ -37,18 +32,16 @@ const mockProjects = [
 const Dashboard = () => {
 
     const { theme, toggleTheme } = useTheme();
-    const { user, logout } = useAuth();
+    const { user, logout, refreshUser } = useAuth();
     const navigate = useNavigate();
     const { data: announcements = [], isLoading: announcementsLoading, error: announcementsError } = useAnnouncements();
     const { data: events = [], isLoading: eventsLoading, error: eventsError } = useEvents();
     const { data: myProjectsData, isLoading: projectsLoading, error: projectsError } = useMyProjects();
+    const { data: notifications = [], isLoading: notificationsLoading, unreadCount, markAllAsRead } = useNotifications();
 
     // Get projects from API response
     console.log(myProjectsData)
     const myProjects = myProjectsData || [];
-    const [unreadCount, setUnreadCount] = useState(
-        mockNotifications.filter(n => n.unread).length
-    );
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const notificationsRef = useRef();
@@ -67,6 +60,11 @@ const Dashboard = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Fetch latest user data on component mount
+    useEffect(() => {
+        refreshUser();
+    }, [refreshUser]);
+
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -81,7 +79,12 @@ const Dashboard = () => {
                         variant="ghost"
                         size="icon"
                         className="rounded-full relative"
-                        onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                        onClick={() => {
+                            setIsNotificationsOpen(!isNotificationsOpen);
+                            if (!isNotificationsOpen) {
+                                markAllAsRead();
+                            }
+                        }}
                     >
                         <Bell className="w-5 h-5" />
                         {unreadCount > 0 && (
@@ -93,19 +96,27 @@ const Dashboard = () => {
                     {isNotificationsOpen && (
                         <div className="absolute top-full left-0 w-80 z-50 bg-background border rounded-md shadow-lg">
                             <div className="p-3 font-medium border-b">Notifications</div>
-                            {mockNotifications.map((notification) => (
-                                <div key={notification.id} className="p-3 hover:bg-accent cursor-pointer flex flex-col items-start">
-                                    <div className="flex items-start gap-2 w-full">
-                                        {notification.unread && (
-                                            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                                        )}
-                                        <div className="flex-1">
-                                            <p className="text-sm">{notification.text}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">{notification.time}</p>
+                            {notificationsLoading ? (
+                                <div className="p-3 text-center text-muted-foreground">Loading...</div>
+                            ) : notifications?.length > 0 ? (
+                                notifications.map((notification) => (
+                                    <div key={notification._id} className="p-3 hover:bg-muted cursor-pointer flex flex-col items-start">
+                                        <div className="flex items-start gap-2 w-full">
+                                            {!notification.hasRead && (
+                                                <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                                            )}
+                                            <div className="flex-1">
+                                                <p className="text-sm">{notification.content}</p>
+                                                <p className="text-xs text-muted-foreground mt-1">
+                                                    {new Date(notification.createdAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <div className="p-3 text-center text-muted-foreground">No notifications</div>
+                            )}
                         </div>
                     )}
                 </div>

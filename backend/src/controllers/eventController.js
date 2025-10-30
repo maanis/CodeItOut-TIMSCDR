@@ -1,4 +1,6 @@
 const Event = require('../models/Event');
+const Notification = require('../models/Notification');
+const Student = require('../models/Student');
 
 // @desc    Create a new event
 // @route   POST /api/events
@@ -18,6 +20,23 @@ const createEvent = async (req, res) => {
         });
 
         await event.save();
+
+        // Create notifications for all students
+        try {
+            const students = await Student.find({}, '_id');
+            const notifications = students.map(student => ({
+                content: `New event: ${title}`,
+                userId: student._id,
+                type: 'event'
+            }));
+
+            if (notifications.length > 0) {
+                await Notification.insertMany(notifications);
+            }
+        } catch (notificationError) {
+            console.error('Error creating notifications:', notificationError);
+            // Don't fail the event creation if notifications fail
+        }
 
         res.status(201).json({
             message: 'Event created successfully',

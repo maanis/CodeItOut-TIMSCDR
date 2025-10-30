@@ -12,7 +12,9 @@ import {
     Sparkles,
     Award,
     UserCheck,
-    LogOut
+    LogOut,
+    Menu,
+    X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -34,6 +36,7 @@ const navItems = [
 const AdminSidebar = () => {
     const { logout } = useAuth();
     const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const handleLogout = () => {
         logout();

@@ -1,4 +1,6 @@
 const Announcement = require('../models/Announcement');
+const Notification = require('../models/Notification');
+const Student = require('../models/Student');
 
 // @desc    Create a new announcement
 // @route   POST /api/announcements
@@ -17,6 +19,23 @@ const createAnnouncement = async (req, res) => {
         });
 
         await announcement.save();
+
+        // Create notifications for all students
+        try {
+            const students = await Student.find({}, '_id');
+            const notifications = students.map(student => ({
+                content: `New announcement: ${title}`,
+                userId: student._id,
+                type: 'announcement'
+            }));
+
+            if (notifications.length > 0) {
+                await Notification.insertMany(notifications);
+            }
+        } catch (notificationError) {
+            console.error('Error creating notifications:', notificationError);
+            // Don't fail the announcement creation if notifications fail
+        }
 
         res.status(201).json({
             message: 'Announcement created successfully',
