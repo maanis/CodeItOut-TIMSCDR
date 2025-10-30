@@ -1,0 +1,134 @@
+import { NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import {
+    LayoutDashboard,
+    Megaphone,
+    Calendar,
+    Users,
+    Trophy,
+    FolderKanban,
+    Settings,
+    Sparkles,
+    Award,
+    UserCheck,
+    LogOut
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { useAuth } from '@/contexts/AuthContext';
+
+const navItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
+    { icon: Megaphone, label: 'Announcements', path: '/admin/announcements' },
+    { icon: Calendar, label: 'Events', path: '/admin/events' },
+    { icon: FolderKanban, label: 'Projects', path: '/admin/projects' },
+    { icon: Award, label: 'Badges', path: '/admin/badges' },
+    { icon: Users, label: 'Students', path: '/admin/students' },
+    { icon: UserCheck, label: 'Community', path: '/admin/community' },
+    { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard' },
+    // { icon: Settings, label: 'Settings', path: '/admin/settings' },
+];
+
+const AdminSidebar = () => {
+    const { logout } = useAuth();
+    const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+
+    const handleLogout = () => {
+        logout();
+        setIsLogoutDialogOpen(false);
+    };
+    return (
+        <aside className="hidden lg:flex flex-col w-64 border-r border-border bg-card/50 backdrop-blur-sm">
+            <div className="p-6 border-b border-border">
+                <div className="flex items-center gap-3">
+                    <img src="/logo.png" className='h-12 w-12' alt="" />
+
+                    <div>
+                        <h2 className="font-bold text-lg">Admin Panel</h2>
+                        <p className="text-xs text-muted-foreground">Management</p>
+                    </div>
+                </div>
+            </div>
+
+            <nav className="flex-1 p-4">
+                <ul className="space-y-2">
+                    {navItems.map((item, index) => (
+                        <motion.li
+                            key={item.path}
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: index * 0.05 }}
+                        >
+                            <NavLink
+                                to={item.path}
+                                end={item.path === '/admin/dashboard'}
+                                className={({ isActive }) =>
+                                    cn(
+                                        'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                                        isActive
+                                            ? 'bg-primary text-primary-foreground shadow-md'
+                                            : 'hover:bg-secondary text-foreground'
+                                    )
+                                }
+                            >
+                                {({ isActive }) => (
+                                    <>
+                                        <item.icon className={cn('w-5 h-5', isActive && 'animate-pulse')} />
+                                        <span className="font-medium">{item.label}</span>
+                                    </>
+                                )}
+                            </NavLink>
+                        </motion.li>
+                    ))}
+                </ul>
+            </nav>
+
+            {/* Logout Button */}
+            <div className="p-4 border-t border-border">
+                <Button
+                    onClick={() => setIsLogoutDialogOpen(true)}
+                    variant="ghost"
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-destructive hover:text-destructive-foreground text-muted-foreground hover:text-white"
+                >
+                    <LogOut className="w-5 h-5" />
+                    <span className="font-medium">Logout</span>
+                </Button>
+            </div>
+
+            {/* Logout Confirmation Dialog */}
+            <Dialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+                <DialogContent className="sm:max-w-[400px]">
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <LogOut className="w-5 h-5 text-destructive" />
+                            Confirm Logout
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4">
+                        <p className="text-muted-foreground">
+                            Are you sure you want to logout? You'll need to sign in again to access your account.
+                        </p>
+                    </div>
+                    <DialogFooter className="gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => setIsLogoutDialogOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleLogout}
+                            className="bg-destructive hover:bg-destructive/90"
+                        >
+                            Logout
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </aside>
+    );
+};
+
+export default AdminSidebar;
