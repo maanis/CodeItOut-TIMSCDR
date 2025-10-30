@@ -29,6 +29,24 @@ const studentSchema = new mongoose.Schema({
         default: [],
         required: true,
     },
+    avatarUrl: {
+        type: String,
+        default: null
+    },
+    badges: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Badge',
+        default: []
+    },
+    approvedProjects: {
+        type: [mongoose.Schema.Types.ObjectId],
+        ref: 'Project',
+        default: []
+    },
+    inCommunity: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now

@@ -112,6 +112,7 @@ const createStudent = async (req, res) => {
                 name: student.name,
                 roll: student.roll,
                 email: student.email,
+                projects: student.approvedProjects || [],
                 hasFaceEmbeddings: student.faceEmbeddings && student.faceEmbeddings.length > 0,
                 createdAt: student.createdAt
             }
@@ -141,6 +142,7 @@ const getAllStudents = async (req, res) => {
 
         const students = await Student.find(query)
             .select('-__v')
+            .populate('badges', 'name icon points')
             .sort({ createdAt: -1 })
             .limit(limit * 1)
             .skip((page - 1) * limit);
@@ -152,6 +154,11 @@ const getAllStudents = async (req, res) => {
                 id: student._id,
                 name: student.name,
                 roll: student.roll,
+                email: student.email,
+                avatarUrl: student.avatarUrl,
+                badges: student.badges,
+                projects: student.approvedProjects || [],
+                inCommunity: student.inCommunity,
                 hasFaceEmbeddings: student.faceEmbeddings && student.faceEmbeddings.length > 0,
                 createdAt: student.createdAt,
                 updatedAt: student.updatedAt
@@ -175,7 +182,7 @@ const getStudentById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const student = await Student.findById(id).select('-__v');
+        const student = await Student.findById(id).select('-__v').populate('badges', 'name icon points');
 
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
@@ -186,7 +193,12 @@ const getStudentById = async (req, res) => {
                 id: student._id,
                 name: student.name,
                 roll: student.roll,
-                faceEmbeddings: student.faceEmbeddings,
+                email: student.email,
+                avatarUrl: student.avatarUrl,
+                badges: student.badges,
+                projects: student.approvedProjects || [],
+                inCommunity: student.inCommunity,
+                hasFaceEmbeddings: student.faceEmbeddings && student.faceEmbeddings.length > 0,
                 createdAt: student.createdAt,
                 updatedAt: student.updatedAt
             }
@@ -202,7 +214,7 @@ const getStudentByRoll = async (req, res) => {
     try {
         const { roll } = req.params;
 
-        const student = await Student.findOne({ roll: roll.toUpperCase() }).select('-__v');
+        const student = await Student.findOne({ roll: roll.toUpperCase() }).select('-__v').populate('badges', 'name icon points');
 
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
@@ -213,7 +225,12 @@ const getStudentByRoll = async (req, res) => {
                 id: student._id,
                 name: student.name,
                 roll: student.roll,
-                faceEmbeddings: student.faceEmbeddings,
+                email: student.email,
+                avatarUrl: student.avatarUrl,
+                badges: student.badges,
+                projects: student.approvedProjects || [],
+                inCommunity: student.inCommunity,
+                hasFaceEmbeddings: student.faceEmbeddings && student.faceEmbeddings.length > 0,
                 createdAt: student.createdAt,
                 updatedAt: student.updatedAt
             }
@@ -293,6 +310,7 @@ const updateStudent = async (req, res) => {
                 id: student._id,
                 name: student.name,
                 roll: student.roll,
+                projects: student.approvedProjects || [],
                 hasFaceEmbeddings: student.faceEmbeddings && student.faceEmbeddings.length > 0,
                 profileImage: student.profileImage,
                 createdAt: student.createdAt,
@@ -381,6 +399,66 @@ const updateFaceEmbeddings = async (req, res) => {
     }
 };
 
+// Add student to community
+const addToCommunity = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const student = await Student.findByIdAndUpdate(
+            id,
+            { inCommunity: true, updatedAt: new Date() },
+            { new: true }
+        ).select('-__v');
+
+        if (!student) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+
+        res.json({
+            message: 'Student added to community successfully',
+            student: {
+                id: student._id,
+                name: student.name,
+                roll: student.roll,
+                inCommunity: student.inCommunity
+            }
+        });
+    } catch (error) {
+        console.error('Add to community error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// Remove student from community
+const removeFromCommunity = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const student = await Student.findByIdAndUpdate(
+            id,
+            { inCommunity: false, updatedAt: new Date() },
+            { new: true }
+        ).select('-__v');
+
+        if (!student) {
+            return res.status(404).json({ error: 'Student not found' });
+        }
+
+        res.json({
+            message: 'Student removed from community successfully',
+            student: {
+                id: student._id,
+                name: student.name,
+                roll: student.roll,
+                inCommunity: student.inCommunity
+            }
+        });
+    } catch (error) {
+        console.error('Remove from community error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 module.exports = {
     createStudent,
     getAllStudents,
@@ -388,5 +466,7 @@ module.exports = {
     getStudentByRoll,
     updateStudent,
     deleteStudent,
-    updateFaceEmbeddings
+    updateFaceEmbeddings,
+    addToCommunity,
+    removeFromCommunity
 };

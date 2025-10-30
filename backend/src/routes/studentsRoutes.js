@@ -6,7 +6,9 @@ const {
     getStudentByRoll,
     updateStudent,
     deleteStudent,
-    updateFaceEmbeddings
+    updateFaceEmbeddings,
+    addToCommunity,
+    removeFromCommunity
 } = require('../controllers/studentsController');
 const { uploadSingle } = require('../config/multer');
 
@@ -46,5 +48,15 @@ router.delete('/:id', deleteStudent);
 // @desc    Update face embeddings for a student
 // @access  Private (should require authentication)
 router.put('/:id/face-embeddings', updateFaceEmbeddings);
+
+// @route   PUT /api/students/:id/add-to-community
+// @desc    Add student to community
+// @access  Private (admin only)
+router.put('/:id/add-to-community', addToCommunity);
+
+// @route   PUT /api/students/:id/remove-from-community
+// @desc    Remove student from community
+// @access  Private (admin only)
+router.put('/:id/remove-from-community', removeFromCommunity);
 
 module.exports = router;

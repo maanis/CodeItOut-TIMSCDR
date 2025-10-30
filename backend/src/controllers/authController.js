@@ -5,6 +5,7 @@ const Student = require('../models/Student');
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
+const path = require('path');
 
 // Python face recognition API URL (adjust port as needed)
 const FACE_API_URL = process.env.FACE_API_URL || 'http://localhost:8000';
@@ -53,7 +54,35 @@ const extractFaceEmbeddings = async (imagePath) => {
 
 const register = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        let requestData;
+
+        // Handle different content types
+        if (req.headers['content-type'] === 'text/plain' && req.body) {
+            try {
+                requestData = JSON.parse(req.body);
+            } catch (parseError) {
+                return res.status(400).json({
+                    error: 'Invalid JSON in request body',
+                    details: 'Content-Type is text/plain but body is not valid JSON'
+                });
+            }
+        } else if (req.headers['content-type']?.includes('application/json') || !req.headers['content-type']) {
+            requestData = req.body;
+        } else {
+            return res.status(400).json({
+                error: 'Unsupported Content-Type',
+                supported: ['application/json', 'text/plain (with valid JSON)']
+            });
+        }
+
+        const { name, email, password } = requestData;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                error: 'Missing required fields: name, email, password',
+                received: requestData
+            });
+        }
 
         // Check if teacher already exists
         const existingTeacher = await Teacher.findOne({ email });
@@ -139,24 +168,43 @@ const registerStudent = async (req, res) => {
             return res.status(400).json({ error: faceResult.error });
         }
 
+        // Generate unique filename for avatar
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const avatarFilename = `student-${uniqueSuffix}${path.extname(req.file.originalname)}`;
+        const avatarPath = path.join(__dirname, '../../uploads', avatarFilename);
+
+        // Ensure uploads directory exists
+        const uploadsDir = path.join(__dirname, '../../uploads');
+        if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+
+        // Move uploaded file to uploads folder
+        try {
+            fs.renameSync(req.file.path, avatarPath);
+        } catch (error) {
+            console.error('Error moving avatar file:', error);
+            // Clean up temp file
+            if (fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+            return res.status(500).json({ error: 'Failed to save avatar image' });
+        }
+
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new student with face embeddings
+        // Create new student with face embeddings and avatar URL
         const student = new Student({
             name: name.trim(),
             roll: roll.toUpperCase().trim(),
             email: email.toLowerCase().trim(),
             password: hashedPassword,
-            faceEmbeddings: faceResult.embeddings
+            faceEmbeddings: faceResult.embeddings,
+            avatarUrl: `/uploads/${avatarFilename}`
         });
 
         await student.save();
-
-        // Clean up uploaded file after successful processing
-        if (fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
-        }
 
         // Generate JWT token
         const token = jwt.sign(
@@ -181,6 +229,9 @@ const registerStudent = async (req, res) => {
                 name: student.name,
                 roll: student.roll,
                 email: student.email,
+                badges: student.badges || [],
+                projects: student.approvedProjects || [],
+                avatarUrl: student.avatarUrl,
                 hasFaceEmbeddings: student.faceEmbeddings && student.faceEmbeddings.length > 0
             }
         });
@@ -198,21 +249,40 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find teacher by email
-        const teacher = await Teacher.findOne({ email });
-        if (!teacher) {
+        // Determine user type and role
+        let user;
+        let role;
+
+        // First check if it's a teacher (admin or regular teacher)
+        user = await Teacher.findOne({ email });
+        if (user) {
+            // It's a teacher - check if admin
+            role = email.toLowerCase().includes('admin') ? 'admin' : 'teacher';
+        } else {
+            // Check student collection with populated badges
+            user = await Student.findOne({ email }).populate('badges', 'name icon points');
+            if (user) {
+                role = 'student';
+            }
+        }
+
+        if (!user) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
         // Check password
-        const isPasswordValid = await bcrypt.compare(password, teacher.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
 
-        // Generate JWT token
+        // Generate JWT token with correct role
         const token = jwt.sign(
-            { id: teacher._id, email: teacher.email },
+            {
+                id: user._id,
+                email: user.email,
+                role: role
+            },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -225,13 +295,19 @@ const login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
+        console.log('Login successful:', { token, user });
+
         res.json({
             message: 'Login successful',
             token,
-            teacher: {
-                id: teacher._id,
-                name: teacher.name,
-                email: teacher.email
+            user: {
+                id: user._id,
+                name: user.name,
+                avatarUrl: user.avatarUrl,
+                email: user.email,
+                badges: user.badges || [],
+                projects: user.approvedProjects || [],
+                role: role
             }
         });
     } catch (error) {
@@ -272,18 +348,33 @@ const isAuthenticated = async (req, res) => {
 
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            // Optional: Check if teacher still exists in database
-            const teacher = await Teacher.findById(decoded.id);
-            if (!teacher) {
+
+            // Check if it's a teacher
+            let user = await Teacher.findById(decoded.id);
+            let userType = 'teacher';
+
+            if (!user) {
+                // Check if it's a student
+                user = await Student.findById(decoded.id).populate('badges', 'name icon points description');
+                userType = 'student';
+            }
+
+            if (!user) {
                 return res.json({ authenticated: false });
             }
 
             res.json({
                 authenticated: true,
-                teacher: {
-                    id: teacher._id,
-                    name: teacher.name,
-                    email: teacher.email
+                [userType]: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    ...(userType === 'student' && {
+                        roll: user.roll,
+                        badges: user.badges || [],
+                        avatarUrl: user.avatarUrl,
+                        hasFaceEmbeddings: user.faceEmbeddings && user.faceEmbeddings.length > 0
+                    })
                 }
             });
         } catch (error) {
