@@ -4,6 +4,19 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
+
+// Import models to register them with Mongoose
+require('./models/Student');
+require('./models/Teacher');
+require('./models/Quiz');
+require('./models/QuizAttempt');
+require('./models/Announcement');
+require('./models/Event');
+require('./models/Project');
+require('./models/Badge');
+require('./models/Notification');
+require('./models/Session');
+
 const healthRoutes = require('./routes/healthRoutes');
 const authRoutes = require('./routes/authRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
@@ -13,6 +26,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const projectRoutes = require('./routes/projectRoutes');
 const badgeRoutes = require('./routes/badgeRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const quizRoutes = require('./routes/quizRoutes');
 
 const app = express();
 
@@ -54,6 +68,8 @@ app.use('/api/events', eventRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/badges', badgeRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/contests', quizRoutes);
 
 // Connect to DB
 connectDB();

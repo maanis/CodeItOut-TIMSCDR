@@ -39,7 +39,6 @@ badgeSchema.pre('save', function (next) {
 });
 
 // Index for faster queries
-badgeSchema.index({ name: 1 });
 badgeSchema.index({ points: -1 });
 
 module.exports = mongoose.model('Badge', badgeSchema);

@@ -71,7 +71,7 @@ const AdminDashboard = () => {
     return (
         <div className="space-y-8">
             {/* Header with User Menu */}
-            <div className="flex justify-end items-center">
+            {/* <div className="flex justify-end items-center">
                 <div className="flex gap-3 items-center">
                     <Button
                         variant="ghost"
@@ -120,7 +120,7 @@ const AdminDashboard = () => {
                         )}
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             {/* Welcome Header */}
             <motion.div
