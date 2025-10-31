@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Trash2, Play, Square, Trophy, Calendar, Clock, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Play, Square, Trophy, Calendar, Clock, Eye, Sparkles, X, Wand2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useContests, createContest, updateContest, deleteContest, startContest, stopContest } from '@/hooks/useContests';
 
 const ManageContests = () => {
@@ -27,6 +28,14 @@ const ManageContests = () => {
         questions: []
     });
     const [questionsJson, setQuestionsJson] = useState('');
+
+    // Generate questions state
+    const [showGenerate, setShowGenerate] = useState(false);
+    const [keywords, setKeywords] = useState([]);
+    const [currentKeyword, setCurrentKeyword] = useState('');
+    const [numQuestions, setNumQuestions] = useState(5);
+    const [difficulty, setDifficulty] = useState('medium');
+    const [isGenerating, setIsGenerating] = useState(false);
 
     // Handle countdown timers for ongoing contests
     useEffect(() => {
@@ -126,6 +135,12 @@ const ManageContests = () => {
             questions: contest.questions || []
         });
         setQuestionsJson(JSON.stringify(contest.questions || [], null, 2));
+        // Reset generate form
+        setShowGenerate(false);
+        setKeywords([]);
+        setCurrentKeyword('');
+        setNumQuestions(5);
+        setDifficulty('medium');
         setIsDialogOpen(true);
     };
 
@@ -166,6 +181,140 @@ const ManageContests = () => {
         navigate(`/adminn/contests/${contestId}/results`);
     };
 
+    // Keyword management
+    const addKeyword = () => {
+        if (currentKeyword.trim() && !keywords.includes(currentKeyword.trim())) {
+            setKeywords([...keywords, currentKeyword.trim()]);
+            setCurrentKeyword('');
+        }
+    };
+
+    const removeKeyword = (keywordToRemove) => {
+        setKeywords(keywords.filter(k => k !== keywordToRemove));
+    };
+
+    const handleKeywordKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addKeyword();
+        }
+    };
+
+    // Generate questions with Gemini API
+    const generateQuestions = async () => {
+        if (keywords.length === 0) {
+            alert('Please add at least one keyword');
+            return;
+        }
+
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) {
+            alert('Gemini API key not configured. Please add VITE_GEMINI_API_KEY to your .env file.');
+            return;
+        }
+
+        setIsGenerating(true);
+        try {
+            const prompt = `Generate ${numQuestions} multiple-choice questions about ${keywords.join(', ')} at ${difficulty} difficulty level.
+
+Requirements:
+- Each question must have exactly 4 options
+- Only one correct answer per question
+- Questions should be technical and educational
+- Points should be assigned based on difficulty: easy=1, medium=2, hard=3
+- Return ONLY valid JSON array in this exact format:
+
+[
+  {
+    "questionText": "Question text here?",
+    "options": ["Option A", "Option B", "Option C", "Option D"],
+    "correctAnswer": "Correct Option",
+    "points": 2
+  }
+]
+
+Topic keywords: ${keywords.join(', ')}
+Difficulty: ${difficulty}
+Number of questions: ${numQuestions}`;
+            console.log(prompt)
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Gemini API error:', response.status, errorData);
+                throw new Error(`Gemini API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+            }
+
+            const data = await response.json();
+            const generatedText = data.candidates[0].content.parts[0].text;
+            console.log(generatedText)
+
+            // Extract JSON from the response (remove markdown formatting if present)
+            const jsonMatch = generatedText.match(/\[[\s\S]*\]/);
+            if (!jsonMatch) {
+                throw new Error('Invalid response format from Gemini');
+            }
+
+            const questions = JSON.parse(jsonMatch[0]);
+
+            // Validate the generated questions
+            if (!Array.isArray(questions) || questions.length === 0) {
+                throw new Error('No questions generated');
+            }
+
+            // Validate each question structure
+            questions.forEach((q, index) => {
+                if (!q.questionText || !Array.isArray(q.options) || q.options.length !== 4 || !q.correctAnswer || !q.points) {
+                    throw new Error(`Question ${index + 1} has invalid structure`);
+                }
+                if (!q.options.includes(q.correctAnswer)) {
+                    throw new Error(`Question ${index + 1}: correct answer must be one of the options`);
+                }
+            });
+
+            // Set the generated questions
+            setFormData({ ...formData, questions });
+            setQuestionsJson(JSON.stringify(questions, null, 2));
+            setShowGenerate(false);
+
+            // Reset generate form
+            setKeywords([]);
+            setCurrentKeyword('');
+            setNumQuestions(5);
+            setDifficulty('medium');
+
+        } catch (error) {
+            console.error('Error generating questions:', error);
+            let errorMessage = 'Failed to generate questions';
+
+            if (error.message.includes('Gemini API error')) {
+                errorMessage = error.message;
+            } else if (error.message.includes('fetch')) {
+                errorMessage = 'Network error: Please check your internet connection';
+            } else if (error.message.includes('JSON')) {
+                errorMessage = 'Invalid response format from AI service';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            alert(errorMessage);
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
@@ -184,6 +333,12 @@ const ManageContests = () => {
                                 questions: []
                             });
                             setQuestionsJson('');
+                            // Reset generate form
+                            setShowGenerate(false);
+                            setKeywords([]);
+                            setCurrentKeyword('');
+                            setNumQuestions(5);
+                            setDifficulty('medium');
                         }}>
                             <Plus className="w-4 h-4 mr-2" />
                             Create Contest
@@ -225,7 +380,106 @@ const ManageContests = () => {
                                     />
                                 </div>
                                 <div className="col-span-2">
-                                    <Label htmlFor="questions">Questions (JSON)</Label>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <Label htmlFor="questions">Questions (JSON)</Label>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setShowGenerate(!showGenerate)}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Sparkles className="w-4 h-4" />
+                                            Generate with AI
+                                        </Button>
+                                    </div>
+
+                                    {showGenerate && (
+                                        <motion.div
+                                            initial={{ opacity: 0, height: 0 }}
+                                            animate={{ opacity: 1, height: 'auto' }}
+                                            exit={{ opacity: 0, height: 0 }}
+                                            className="mb-4 p-4 border rounded-lg bg-blue-50 dark:bg-blue-950/20"
+                                        >
+                                            <h4 className="font-medium mb-3 flex items-center gap-2">
+                                                <Wand2 className="w-4 h-4" />
+                                                Generate Questions with Gemini AI
+                                            </h4>
+
+                                            <div className="space-y-4">
+                                                {/* Keywords */}
+                                                <div>
+                                                    <Label className="text-sm">Keywords (press Enter to add)</Label>
+                                                    <div className="flex flex-wrap gap-2 mb-2">
+                                                        {keywords.map((keyword, index) => (
+                                                            <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                                                                {keyword}
+                                                                <X
+                                                                    className="w-3 h-3 cursor-pointer hover:text-red-500"
+                                                                    onClick={() => removeKeyword(keyword)}
+                                                                />
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                    <Input
+                                                        value={currentKeyword}
+                                                        onChange={(e) => setCurrentKeyword(e.target.value)}
+                                                        onKeyPress={handleKeywordKeyPress}
+                                                        placeholder="Add keywords (e.g., React, JavaScript, MERN)"
+                                                        className="mb-2"
+                                                    />
+                                                </div>
+
+                                                {/* Number of questions and difficulty */}
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <Label className="text-sm">Number of Questions</Label>
+                                                        <Input
+                                                            type="number"
+                                                            min="1"
+                                                            max="20"
+                                                            value={numQuestions}
+                                                            onChange={(e) => setNumQuestions(parseInt(e.target.value) || 5)}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <Label className="text-sm">Difficulty</Label>
+                                                        <Select value={difficulty} onValueChange={setDifficulty}>
+                                                            <SelectTrigger>
+                                                                <SelectValue />
+                                                            </SelectTrigger>
+                                                            <SelectContent>
+                                                                <SelectItem value="easy">Easy</SelectItem>
+                                                                <SelectItem value="medium">Medium</SelectItem>
+                                                                <SelectItem value="hard">Hard</SelectItem>
+                                                            </SelectContent>
+                                                        </Select>
+                                                    </div>
+                                                </div>
+
+                                                {/* Generate button */}
+                                                <Button
+                                                    type="button"
+                                                    onClick={generateQuestions}
+                                                    disabled={isGenerating || keywords.length === 0}
+                                                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                                                >
+                                                    {isGenerating ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                                            Generating...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Sparkles className="w-4 h-4 mr-2" />
+                                                            Generate Questions
+                                                        </>
+                                                    )}
+                                                </Button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+
                                     <Textarea
                                         id="questions"
                                         value={questionsJson}

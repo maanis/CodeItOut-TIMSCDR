@@ -1,297 +1,282 @@
-# Room Checkr - Backend
+# CodeItOut Backend
 
-A comprehensive attendance management system with face recognition capabilities.
+A comprehensive backend API for the CodeItOut educational platform, built with Node.js/Express and Python/FastAPI. This backend supports student management, quiz systems, face recognition, project tracking, and various educational features.
 
-## Features
+## 🚀 Features
 
-- ✅ Student Management with Face Recognition
-- ✅ Session-based Attendance Tracking
-- ✅ Real-time Location Verification
-- ✅ Image Upload and Processing
-- ✅ RESTful API Design
-- ✅ MongoDB Integration
+- **Authentication & Authorization**: JWT-based authentication with role-based access control
+- **Student Management**: Complete CRUD operations for student profiles
+- **Quiz System**: Create, manage, and track quiz attempts with scoring
+- **Face Recognition**: AI-powered face recognition using FaceNet and MTCNN
+- **Project Management**: Track student projects and submissions
+- **Event Management**: Schedule and manage educational events
+- **Announcement System**: Broadcast important notices to students
+- **Badge System**: Gamification with achievement badges
+- **Notification System**: Real-time notifications for users
+- **File Upload**: Secure file upload handling with Multer
+- **Session Management**: Track user sessions and activity
 
-## Tech Stack
+## 🛠 Tech Stack
 
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose
-- **File Upload:** Multer
-- **Face Recognition:** Python FastAPI + FaceNet PyTorch
-- **Authentication:** JWT Tokens
+### Backend (Node.js)
+- **Runtime**: Node.js
+- **Framework**: Express.js v5.1.0
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: JWT (jsonwebtoken)
+- **Security**: bcryptjs for password hashing
+- **File Handling**: Multer for multipart uploads
+- **CORS**: Configurable CORS policy
+- **Development**: Nodemon for hot reloading
 
-## Project Structure
+### AI/ML (Python)
+- **Framework**: FastAPI
+- **Face Recognition**: FaceNet-PyTorch, MTCNN
+- **Computer Vision**: OpenCV, Pillow, scikit-image
+- **Deep Learning**: PyTorch
+- **Image Processing**: NumPy, SciPy
+
+## 📁 Project Structure
 
 ```
 backend/
 ├── src/
 │   ├── config/
-│   │   ├── db.js              # Database configuration
+│   │   ├── db.js              # MongoDB connection configuration
 │   │   └── multer.js          # File upload configuration
-│   ├── controllers/
+│   ├── controllers/           # Business logic controllers
 │   │   ├── authController.js
-│   │   ├── sessionController.js
-│   │   └── studentsController.js
+│   │   ├── quizController.js
+│   │   ├── studentsController.js
+│   │   ├── announcementController.js
+│   │   ├── badgeController.js
+│   │   ├── eventController.js
+│   │   ├── notificationController.js
+│   │   ├── projectController.js
+│   │   └── sessionController.js
 │   ├── middleware/
-│   │   └── uploadMiddleware.js
-│   ├── models/
+│   │   ├── auth.js            # JWT authentication middleware
+│   │   └── uploadMiddleware.js # File upload middleware
+│   ├── models/                # Mongoose schemas
+│   │   ├── Student.js
 │   │   ├── Teacher.js
-│   │   ├── Session.js
-│   │   └── Student.js
-│   ├── routes/
+│   │   ├── Quiz.js
+│   │   ├── QuizAttempt.js
+│   │   ├── Announcement.js
+│   │   ├── Event.js
+│   │   ├── Project.js
+│   │   ├── Badge.js
+│   │   ├── Notification.js
+│   │   └── Session.js
+│   ├── routes/                # API route definitions
 │   │   ├── authRoutes.js
-│   │   ├── sessionRoutes.js
+│   │   ├── quizRoutes.js
 │   │   ├── studentsRoutes.js
-│   │   └── uploadRoutes.js
-│   └── index.js               # Main application file
-├── uploads/                   # Uploaded files directory
-├── server.py                  # Python face recognition API
-├── package.json
-└── README.md
+│   │   ├── announcementRoutes.js
+│   │   ├── badgeRoutes.js
+│   │   ├── eventRoutes.js
+│   │   ├── notificationRoutes.js
+│   │   ├── projectRoutes.js
+│   │   ├── sessionRoutes.js
+│   │   ├── uploadRoutes.js
+│   │   └── healthRoutes.js
+│   └── index.js               # Main application entry point
+├── uploads/                   # File upload directory
+├── app.py                     # FastAPI face recognition service
+├── requirements.txt           # Python dependencies
+├── package.json               # Node.js dependencies and scripts
+├── .env                       # Environment variables
+├── start_face_api.bat         # Windows batch script for face API
+└── seedBadges.js              # Database seeding script
 ```
 
-## Installation
+## 🔧 Installation & Setup
 
 ### Prerequisites
+- Node.js (v16 or higher)
+- Python (v3.8 or higher)
+- MongoDB (local or cloud instance)
+- Git
 
-- Node.js (v14 or higher)
-- MongoDB
-- Python 3.8+ (for face recognition)
-- CUDA-compatible GPU (recommended for face recognition)
-
-### Setup
-
-1. **Clone the repository:**
-
-   ```bash
-   git clone <repository-url>
-   cd room-checkr/backend
-   ```
-
-2. **Install Node.js dependencies:**
-
-   ```bash
-   npm install
-   ```
-
-3. **Install Python dependencies:**
-
-   ```bash
-   pip install fastapi uvicorn facenet-pytorch torch torchvision pillow numpy
-   ```
-
-4. **Environment Configuration:**
-   Create a `.env` file:
-
-   ```env
-   NODE_ENV=development
-   PORT=5000
-   MONGODB_URI=mongodb://localhost:27017/room-checkr
-   JWT_SECRET=your-secret-key
-   FACE_API_URL=http://localhost:8000
-   ```
-
-5. **Start MongoDB:**
-   ```bash
-   mongod
-   ```
-
-## Running the Application
-
-### Development Mode
-
-1. **Start the Node.js server:**
-
-   ```bash
-   npm run dev
-   ```
-
-2. **Start the Python face recognition server:**
-   ```bash
-   python server.py
-   ```
-   Or use the batch file:
-   ```bash
-   ./start_face_api.bat
-   ```
-
-### Production Mode
-
+### 1. Clone the Repository
 ```bash
-npm start
+git clone <repository-url>
+cd backend
 ```
 
-## API Endpoints
+### 2. Install Node.js Dependencies
+```bash
+npm install
+```
+
+### 3. Install Python Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Environment Configuration
+Create a `.env` file in the root directory:
+
+```env
+MONGO_URI=mongodb://127.0.0.1:27017/codeItOutHackathon
+PORT=5000
+JWT_SECRET=your_super_secret_jwt_key_here
+```
+
+### 5. Start MongoDB
+Ensure MongoDB is running on your system or update the `MONGO_URI` to point to your MongoDB instance.
+
+### 6. Start the Services
+
+#### Start the Node.js Backend
+```bash
+npm run dev
+```
+
+#### Start the Face Recognition API (Python)
+```bash
+# Option 1: Using Python directly
+python app.py
+
+# Option 2: Using the batch script (Windows)
+./start_face_api.bat
+```
+
+The Node.js server will run on `http://localhost:5000` and the FastAPI service on `http://localhost:8000`.
+
+## 🌐 API Endpoints
 
 ### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/logout` - User logout
 
-- `POST /api/auth/register` - Register teacher
-- `POST /api/auth/login` - Login teacher
-- `POST /api/auth/logout` - Logout teacher
-
-### Students Management
-
-- `POST /api/students` - Create student (with face image)
+### Students
 - `GET /api/students` - Get all students
 - `GET /api/students/:id` - Get student by ID
-- `GET /api/students/roll/:roll` - Get student by roll number
-- `PUT /api/students/:id` - Update student (with optional face image)
+- `POST /api/students` - Create new student
+- `PUT /api/students/:id` - Update student
 - `DELETE /api/students/:id` - Delete student
-- `PUT /api/students/:id/face-embeddings` - Update face embeddings
 
-### Sessions Management
+### Quiz System
+- `GET /api/quiz` - Get all quizzes
+- `POST /api/quiz` - Create new quiz
+- `GET /api/quiz/:id` - Get quiz by ID
+- `PUT /api/quiz/:id` - Update quiz
+- `DELETE /api/quiz/:id` - Delete quiz
+- `POST /api/quiz/:id/submit` - Submit quiz attempt
 
-- `POST /api/sessions/create` - Create attendance session
-- `GET /api/sessions/all` - Get all sessions
-- `PUT /api/sessions/close` - Close session
-- `POST /api/sessions/mark-attendance` - Mark attendance
+### Face Recognition
+- `POST /api/face/recognize` - Recognize face from image
+- `POST /api/face/register` - Register new face
+
+### Projects
+- `GET /api/projects` - Get all projects
+- `POST /api/projects` - Create new project
+- `GET /api/projects/:id` - Get project by ID
+- `PUT /api/projects/:id` - Update project
+
+### Events
+- `GET /api/events` - Get all events
+- `POST /api/events` - Create new event
+- `GET /api/events/:id` - Get event by ID
+- `PUT /api/events/:id` - Update event
+
+### Announcements
+- `GET /api/announcements` - Get all announcements
+- `POST /api/announcements` - Create new announcement
+- `GET /api/announcements/:id` - Get announcement by ID
+
+### Badges
+- `GET /api/badges` - Get all badges
+- `POST /api/badges` - Create new badge
+- `GET /api/badges/:id` - Get badge by ID
+
+### Notifications
+- `GET /api/notifications` - Get user notifications
+- `POST /api/notifications` - Create notification
+- `PUT /api/notifications/:id/read` - Mark notification as read
 
 ### File Upload
+- `POST /api/upload` - Upload files
 
-- `POST /api/upload/single` - Single file upload
-- `POST /api/upload/multiple` - Multiple files upload
+### Health Check
+- `GET /api/health` - API health status
 
-## Face Recognition Integration
+## 🔐 Authentication
 
-### How It Works
+The API uses JWT (JSON Web Tokens) for authentication. Include the JWT token in the Authorization header:
 
-1. **Image Upload:** Student photos are uploaded via the API
-2. **Face Detection:** Python service detects faces using MTCNN
-3. **Embedding Extraction:** FaceNet extracts 512-dimensional embeddings
-4. **Storage:** Embeddings are stored in MongoDB for future comparison
-
-### Python API Endpoints
-
-- `POST /extract-embeddings/` - Extract face embeddings from image
-- `POST /compare-faces/` - Compare two face images
-
-### Configuration
-
-Set the Python API URL in your environment:
-
-```env
-FACE_API_URL=http://localhost:8000
+```
+Authorization: Bearer <your-jwt-token>
 ```
 
-## Database Schema
+## 📊 Database Models
 
-### Student Model
+### Student
+- Personal information (name, email, etc.)
+- Academic details
+- Face embeddings for recognition
+- Project associations
+- Badge collections
 
-```javascript
-{
-  name: String,           // Required
-  roll: String,           // Required, unique, uppercase
-  faceEmbeddings: [Number], // Face recognition data
-  profileImage: String,   // Image URL
-  createdAt: Date,
-  updatedAt: Date
-}
-```
+### Quiz
+- Questions with multiple choice options
+- Scoring system
+- Time limits
+- Attempt tracking
 
-### Session Model
+### Project
+- Project details and descriptions
+- Student assignments
+- Submission tracking
+- Evaluation scores
 
-```javascript
-{
-  sessionId: String,      // Auto-generated 6-digit code
-  subject: String,
-  course: String,
-  year: String,
-  division: String,
-  room: String,
-  duration: Number,
-  location: {
-    latitude: Number,
-    longitude: Number
-  },
-  radius: Number,
-  isActive: Boolean,
-  attendance: [{
-    rollNo: String,
-    name: String,
-    deviceId: String,
-    geoLocation: Object,
-    timestamp: Date
-  }]
-}
-```
+### Event
+- Event scheduling
+- Participant management
+- Event categories
 
-## File Upload Configuration
+### Badge
+- Achievement system
+- Gamification features
+- Progress tracking
 
-- **Max Size:** 5MB per file
-- **Allowed Types:** PNG, JPEG, JPG, GIF, WebP
-- **Storage:** Local filesystem in `uploads/` directory
-- **URL Access:** Files served at `/uploads/filename.ext`
+## 🚀 Deployment
 
-## Error Handling
-
-The API includes comprehensive error handling for:
-
-- Database connection issues
-- File upload failures
-- Face recognition errors
-- Validation errors
-- Authentication failures
-
-## Security Features
-
-- JWT-based authentication
-- File type validation
-- Request size limits
-- CORS configuration
-- Input sanitization
-
-## Testing
-
-### API Testing
-
-```bash
-# Test student creation with face image
-curl -X POST "http://localhost:5000/api/students" \
-  -F "name=John Doe" \
-  -F "roll=CS001" \
-  -F "image=@face.jpg"
-```
-
-### Python API Testing
-
-```bash
-# Test face embedding extraction
-curl -X POST "http://localhost:8000/extract-embeddings/" \
-  -F "file=@face.jpg"
-```
-
-## Deployment
-
-### Environment Variables for Production
-
-```env
-NODE_ENV=production
-PORT=5000
-MONGODB_URI=mongodb://production-server/room-checkr
-JWT_SECRET=your-production-secret
-FACE_API_URL=http://face-api-server:8000
-```
+### Production Considerations
+1. Set secure environment variables
+2. Configure MongoDB for production
+3. Set up proper CORS origins
+4. Implement rate limiting
+5. Add request logging
+6. Set up monitoring and alerts
 
 ### Docker Support
+Add Dockerfile and docker-compose.yml for containerized deployment.
 
-Consider using Docker for containerized deployment of both Node.js and Python services.
-
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## License
+## 📝 License
 
-This project is licensed under the MIT License.
+This project is licensed under the ISC License.
 
-## Support
+## 🆘 Support
 
-For issues and questions:
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation for common solutions
 
-- Check the documentation files
-- Review error logs
-- Test with the provided examples
+## 🔄 API Versioning
+
+Current API version: v1
+Base URL: `/api`
+
+All endpoints are prefixed with `/api` and follow RESTful conventions.</content>
+<filePath">c:\Users\Asus TUF\Desktop\code it out\backend\README.md
