@@ -30,7 +30,7 @@ const fetchNotifications = async () => {
 
 export const useNotifications = () => {
     const token = localStorage.getItem('token');
-    
+
     const { data: queryData, isLoading, error, refetch } = useQuery({
         queryKey: ['notifications'],
         queryFn: fetchNotifications,

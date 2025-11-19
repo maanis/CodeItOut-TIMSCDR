@@ -7,6 +7,7 @@ Your application now uses **Pino**, a high-performance JSON logger perfect for p
 ## What's Configured
 
 ### 1. **Automatic HTTP Request/Response Logging**
+
 - Every API call is logged automatically via `pino-http` middleware
 - Logs include: method, URL, status code, response time, headers, IP address
 - Log level is determined by HTTP status:
@@ -16,21 +17,23 @@ Your application now uses **Pino**, a high-performance JSON logger perfect for p
 
 ### 2. **Files Modified/Created**
 
-| File | Purpose |
-|------|---------|
-| `src/config/logger.js` | Pino configuration and middleware |
-| `src/index.js` | Updated to use httpLogger middleware |
-| `.env` | Added LOG_LEVEL and NODE_ENV |
-| `src/config/LOGGER_USAGE.md` | Usage examples for controllers |
+| File                         | Purpose                              |
+| ---------------------------- | ------------------------------------ |
+| `src/config/logger.js`       | Pino configuration and middleware    |
+| `src/index.js`               | Updated to use httpLogger middleware |
+| `.env`                       | Added LOG_LEVEL and NODE_ENV         |
+| `src/config/LOGGER_USAGE.md` | Usage examples for controllers       |
 
 ### 3. **Output**
 
 **Development** (NODE_ENV=development):
+
 - Pretty-printed logs to console
 - Human-readable format with colors
 - Easy to read during development
 
 **Production** (NODE_ENV=production):
+
 - JSON logs written to `logs/app.log`
 - Optimized for log aggregation services (ELK, Splunk, CloudWatch, etc.)
 - Can be streamed to external logging services
@@ -65,9 +68,9 @@ const { logger } = require('../config/logger');
 const createProject = async (req, res) => {
     try {
         logger.info({ userId: req.user.id }, 'Creating project');
-        
+
         const project = await Project.create({...});
-        
+
         logger.info({ userId: req.user.id, projectId: project._id }, 'Project created');
         res.status(201).json(project);
     } catch (error) {
@@ -80,11 +83,11 @@ const createProject = async (req, res) => {
 ### Log Levels
 
 ```javascript
-logger.debug({ data }, 'Detailed information');    // DEBUG
-logger.info({ action }, 'General information');    // INFO
-logger.warn({ warning }, 'Something unexpected');  // WARN
-logger.error({ error }, 'Operation failed');       // ERROR
-logger.fatal({ error }, 'Critical failure');       // FATAL
+logger.debug({ data }, "Detailed information"); // DEBUG
+logger.info({ action }, "General information"); // INFO
+logger.warn({ warning }, "Something unexpected"); // WARN
+logger.error({ error }, "Operation failed"); // ERROR
+logger.fatal({ error }, "Critical failure"); // FATAL
 ```
 
 ## Environment Variables
@@ -105,6 +108,7 @@ NODE_ENV=development        # development | production
 For production environments:
 
 ### 1. **Configure Logging Level**
+
 ```env
 LOG_LEVEL=info
 NODE_ENV=production
@@ -138,6 +142,7 @@ Pino outputs JSON, making it compatible with:
 - **New Relic**: JSON log parsing
 
 Example for streaming to CloudWatch:
+
 ```bash
 npm install @datadog/browser-logs
 ```
@@ -145,11 +150,13 @@ npm install @datadog/browser-logs
 ### 4. **Monitoring Logs**
 
 In production, tail logs:
+
 ```bash
 tail -f logs/app.log | jq .
 ```
 
 To filter by level:
+
 ```bash
 tail -f logs/app.log | jq 'select(.level >= 40)'  # errors and fatals only
 ```
@@ -160,28 +167,33 @@ tail -f logs/app.log | jq 'select(.level >= 40)'  # errors and fatals only
 ✅ **Scalable**: Logs are JSON - easy to parse and aggregate  
 ✅ **Low Overhead**: Minimal CPU/memory impact  
 ✅ **Structured Logging**: Attach metadata to logs for better debugging  
-✅ **Child Loggers**: Can create child loggers for request-specific context  
+✅ **Child Loggers**: Can create child loggers for request-specific context
 
 ## Common Issues & Solutions
 
 ### Issue: Logs not appearing
+
 **Solution**: Check `LOG_LEVEL` environment variable is set to `info` or lower
 
 ### Issue: Logs to console in production
+
 **Solution**: Set `NODE_ENV=production` to write to file instead
 
 ### Issue: Log file growing too large
+
 **Solution**: Implement log rotation using `logrotate` or similar tools
 
 ## Viewing Logs
 
 ### Development (Console)
+
 ```bash
 npm run dev
 # Logs appear in terminal with colors and formatting
 ```
 
 ### Production (File)
+
 ```bash
 # View last 100 lines
 tail -100 logs/app.log

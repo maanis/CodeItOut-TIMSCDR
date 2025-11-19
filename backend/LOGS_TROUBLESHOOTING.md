@@ -5,16 +5,19 @@
 ### Backend Components
 
 1. **Pino Logger Configuration** (`src/config/logger.js`)
+
    - Logs to BOTH console and file
    - File location: `logs/app.log`
    - JSON format for machine parsing
    - Automatic HTTP request/response logging
 
 2. **Logs Controller** (`src/controllers/logsController.js`)
+
    - `GET /api/logs` - Fetch logs with pagination & filtering
    - `GET /api/logs/stats` - Get log statistics
 
 3. **Logs Routes** (`src/routes/logsRoutes.js`)
+
    - Protected routes (admin/teacher only)
    - Authentication required
 
@@ -25,6 +28,7 @@
 ### Frontend Components
 
 1. **Logs Page** (`src/pages/admin/Logs.jsx`)
+
    - Statistics dashboard
    - Advanced filtering
    - Pagination
@@ -40,18 +44,21 @@
 ## 🔍 Troubleshooting: "No Logs Showing"
 
 ### Check 1: Verify Log File Exists
+
 ```bash
 ls -la backend/logs/
 # Should show: app.log
 ```
 
 ### Check 2: Verify Logs Are Being Written
+
 ```bash
 tail -f backend/logs/app.log
 # You should see JSON entries when making API calls
 ```
 
 ### Check 3: Test the API Directly
+
 ```bash
 # Get your admin token first, then:
 curl -H "Authorization: Bearer YOUR_TOKEN" \
@@ -61,13 +68,15 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 ```
 
 ### Check 4: Verify User Role
-The logs API requires `req.user.role` to be either `'admin'` or `'teacher'`. 
+
+The logs API requires `req.user.role` to be either `'admin'` or `'teacher'`.
 
 **Check your JWT token contains role:**
+
 ```javascript
 // In browser console:
-const token = localStorage.getItem('token');
-const decoded = JSON.parse(atob(token.split('.')[1]));
+const token = localStorage.getItem("token");
+const decoded = JSON.parse(atob(token.split(".")[1]));
 console.log(decoded); // Should show { id, email, role: 'admin' }
 ```
 
@@ -76,36 +85,45 @@ console.log(decoded); // Should show { id, email, role: 'admin' }
 ## 🛠️ Common Issues & Fixes
 
 ### Issue 1: Empty Logs Array
+
 **Cause:** No API requests have been made since server startup
 
-**Solution:** 
+**Solution:**
+
 - Make some API calls (e.g., click around the admin panel)
 - Logs only show recent requests
 
 ### Issue 2: HTTP 403 "Access denied"
+
 **Cause:** User is not admin/teacher, or role not in JWT
 
 **Solution:**
+
 ```javascript
 // Check token decode in browser:
-const token = localStorage.getItem('token');
-const decoded = JSON.parse(atob(token.split('.')[1]));
-console.log('Role:', decoded.role); // Should be 'admin' or 'teacher'
+const token = localStorage.getItem("token");
+const decoded = JSON.parse(atob(token.split(".")[1]));
+console.log("Role:", decoded.role); // Should be 'admin' or 'teacher'
 ```
 
 ### Issue 3: HTTP 401 "Invalid token"
+
 **Cause:** Token expired or missing
 
 **Solution:**
+
 - Clear localStorage: `localStorage.clear()`
 - Login again
 - Get new token
 
 ### Issue 4: API returning empty response
+
 **Cause:** Log file not readable or parsing error
 
 **Solution:**
+
 1. Check file permissions:
+
    ```bash
    chmod 644 backend/logs/app.log
    ```
@@ -117,12 +135,15 @@ console.log('Role:', decoded.role); // Should be 'admin' or 'teacher'
    ```
 
 ### Issue 5: Logs page loads but shows "No logs found"
+
 **Possible Causes:**
+
 1. Filters are too restrictive
 2. Logs haven't been created yet
 3. Role filter not working
 
 **Solution:**
+
 1. Click "Apply Filters" with all defaults (no filters)
 2. Make sure to make an API call first to generate logs
 3. Check browser console for detailed errors
@@ -132,6 +153,7 @@ console.log('Role:', decoded.role); // Should be 'admin' or 'teacher'
 ## 📊 How to Generate Test Logs
 
 1. **In Admin Panel**, click through various pages:
+
    - Dashboard
    - Students
    - Projects
@@ -153,12 +175,14 @@ console.log('Role:', decoded.role); // Should be 'admin' or 'teacher'
 ## 🔍 Manual Testing Steps
 
 ### Step 1: Start Backend
+
 ```bash
 cd backend
 npm run dev
 ```
 
 ### Step 2: Check Logs File
+
 ```bash
 tail -f logs/app.log
 # Should see entries like:
@@ -166,24 +190,29 @@ tail -f logs/app.log
 ```
 
 ### Step 3: Start Frontend
+
 ```bash
 cd frontend
 npm run dev
 ```
 
 ### Step 4: Login as Admin
+
 - Username: admin@email.com (or admin email)
 - Password: your_password
 
 ### Step 5: Make API Calls
+
 - Click around admin panel to generate logs
 - Each click = API request = log entry
 
 ### Step 6: Go to Logs Tab
+
 - Admin Panel → Logs
 - Should see your API calls listed
 
 ### Step 7: Test Filters
+
 - Status Filter: Try "Success", "Client Error", "Server Error"
 - Level Filter: Try different log levels
 - Search: Type a URL or error message
@@ -197,6 +226,7 @@ npm run dev
 - **Each entry contains**: method, url, statusCode, responseTime, timestamp
 
 ### Sample Log Entry:
+
 ```json
 {
   "level": 30,
@@ -226,15 +256,18 @@ npm run dev
 ## 🚀 Performance Tips
 
 1. **Don't request huge log sets**
+
    - Default: 50 logs per page
    - Max: 100 logs per page
    - Use filters to narrow results
 
 2. **Use search & filters**
+
    - Search by URL to find specific endpoints
    - Filter by status to find errors quickly
 
 3. **Refresh sparingly**
+
    - Don't auto-refresh every second
    - Manual refresh is fine
 
@@ -247,9 +280,11 @@ npm run dev
 ## 📚 API Reference
 
 ### GET /api/logs
+
 Fetch logs with pagination and filtering
 
 **Query Parameters:**
+
 - `page` (default: 1) - Page number
 - `limit` (default: 50, max: 100) - Logs per page
 - `level` - Filter: debug, info, warn, error, fatal
@@ -259,6 +294,7 @@ Fetch logs with pagination and filtering
 - `endDate` - Filter by end date (ISO format)
 
 **Response:**
+
 ```json
 {
   "logs": [
@@ -284,9 +320,11 @@ Fetch logs with pagination and filtering
 ```
 
 ### GET /api/logs/stats
+
 Get log statistics
 
 **Response:**
+
 ```json
 {
   "totalLogs": 1250,
@@ -319,14 +357,17 @@ Get log statistics
 If logs still aren't showing:
 
 1. **Check backend logs in terminal**
+
    - Look for error messages
    - Check if httpLogger is being called
 
 2. **Check browser console**
+
    - Errors often show here
    - Network tab shows API response
 
 3. **Verify file permissions**
+
    - `ls -la backend/logs/app.log`
    - File should be readable
 

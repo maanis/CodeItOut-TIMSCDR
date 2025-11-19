@@ -29,38 +29,44 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 // Open browser console and run:
 
 // 1. Check token has role
-const token = localStorage.getItem('token');
-const decoded = JSON.parse(atob(token.split('.')[1]));
-console.log('User role:', decoded.role); // Should be 'admin'
+const token = localStorage.getItem("token");
+const decoded = JSON.parse(atob(token.split(".")[1]));
+console.log("User role:", decoded.role); // Should be 'admin'
 
 // 2. Check API base URL
-console.log('API URL:', import.meta.env.VITE_API_URL || 'http://localhost:5000/api');
+console.log(
+  "API URL:",
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api"
+);
 
 // 3. Make direct API call
-fetch('http://localhost:5000/api/logs?page=1&limit=5', {
+fetch("http://localhost:5000/api/logs?page=1&limit=5", {
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
 })
-  .then(r => r.json())
-  .then(data => console.log('Logs:', data.logs.length, 'logs received'))
-  .catch(e => console.error('Error:', e.message));
+  .then((r) => r.json())
+  .then((data) => console.log("Logs:", data.logs.length, "logs received"))
+  .catch((e) => console.error("Error:", e.message));
 ```
 
 ## Expected Behavior
 
 ✅ When you click around the admin panel:
+
 - Each click generates a log entry
 - Visible in `backend/logs/app.log`
 - Displayed in `/admin/logs` page
 
 ✅ Statistics should show:
+
 - Total Requests: > 0
 - Success Rate: > 80%
 - Response Times: < 100ms
 
 ✅ Logs table should display:
+
 - Timestamps
 - HTTP Methods (GET, POST, PUT, DELETE)
 - URLs
@@ -70,17 +76,20 @@ fetch('http://localhost:5000/api/logs?page=1&limit=5', {
 ## If Nothing Shows
 
 1. **Backend side:**
+
    - Confirm `npm run dev` is running
    - Check terminal for errors
    - Verify `backend/logs/app.log` is being written
 
 2. **Frontend side:**
+
    - Open browser DevTools → Console
    - Look for errors
    - Check Network tab for 401/403 responses
    - Verify token has `role: 'admin'`
 
 3. **File permissions:**
+
    ```bash
    chmod 644 backend/logs/app.log
    chmod 755 backend/logs
