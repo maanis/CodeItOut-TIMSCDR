@@ -2,4 +2,5 @@ node_modules
 .env
 venv
 uploads
+logs
 __pycache__
