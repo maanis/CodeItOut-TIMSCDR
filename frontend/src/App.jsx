@@ -31,6 +31,7 @@ import ManageBadges from "./pages/admin/ManageBadges";
 import ManageCommunity from "./pages/admin/ManageCommunity";
 import ManageContests from "./pages/admin/ManageContests";
 import AdminContestResults from "./pages/admin/AdminContestResults";
+import Logs from "./pages/admin/Logs";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -101,6 +102,7 @@ const App = () => (
                                     <Route path="badges" element={<ManageBadges />} />
                                     <Route path="leaderboard" element={<ManageLeaderboard />} />
                                     <Route path="projects" element={<ManageProjects />} />
+                                    <Route path="logs" element={<Logs />} />
                                     <Route path="settings" element={<Settings />} />
                                 </Route>
 

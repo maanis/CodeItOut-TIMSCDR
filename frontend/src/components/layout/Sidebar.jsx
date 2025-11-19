@@ -26,7 +26,7 @@ const navItems = [
     { icon: Code2, label: 'Projects', path: '/dashboard/projects' },
     { icon: Trophy, label: 'Leaderboard', path: '/dashboard/leaderboard' },
     { icon: Users, label: 'Community', path: '/dashboard/community' },
-    { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
+    // { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
 ];
 
 const Sidebar = () => {

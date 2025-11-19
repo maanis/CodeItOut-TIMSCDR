@@ -11,8 +11,7 @@ const projectSchema = new mongoose.Schema({
         required: true
     },
     approved: {
-        type: Boolean,
-        default: false
+        type: Boolean
     },
     githublink: {
         type: String,

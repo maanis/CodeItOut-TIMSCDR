@@ -88,6 +88,10 @@ export const useProjects = () => {
     return useQuery({
         queryKey: ['projects'],
         queryFn: fetchProjects,
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        gcTime: 30 * 60 * 1000, // Cache kept for 30 minutes (formerly cacheTime)
+        refetchOnWindowFocus: false, // Don't refetch when window regains focus
+        refetchOnReconnect: true, // Refetch when reconnecting to internet
     });
 };
 
@@ -96,5 +100,9 @@ export const useMyProjects = () => {
     return useQuery({
         queryKey: ['my-projects'],
         queryFn: fetchMyProjects,
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        gcTime: 30 * 60 * 1000, // Cache kept for 30 minutes (formerly cacheTime)
+        refetchOnWindowFocus: false, // Don't refetch when window regains focus
+        refetchOnReconnect: true, // Refetch when reconnecting to internet
     });
 };

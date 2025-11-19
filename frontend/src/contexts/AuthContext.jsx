@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 
 // API base URL
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -19,7 +19,7 @@ export function AuthProvider({ children }) {
         return null;
     });
 
-    const login = async (email, password) => {
+    const login = useCallback(async (email, password) => {
         try {
             const response = await fetch('http://localhost:5000/api/auth/login', {
                 method: 'POST',
@@ -58,9 +58,9 @@ export function AuthProvider({ children }) {
             console.error('Login error:', error);
             throw error;
         }
-    };
+    }, []);
 
-    const registerStudent = async (name, roll, email, password, profileImage) => {
+    const registerStudent = useCallback(async (name, roll, email, password, profileImage) => {
         try {
             const formData = new FormData();
             formData.append('name', name);
@@ -104,20 +104,24 @@ export function AuthProvider({ children }) {
             console.error('Registration error:', error);
             throw error;
         }
-    };
+    }, []);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         setUser(null);
         localStorage.removeItem('user');
         localStorage.removeItem('token');
-    };
+    }, []);
 
-    const refreshUser = async () => {
+    const refreshUser = useCallback(async () => {
         try {
             const token = localStorage.getItem('token');
-            if (!token) return;
+            console.log(token);
+            if (!token) {
+                console.log('No token found, skipping refresh');
+                return;
+            }
 
-            const response = await fetch('http://localhost:5000/api/auth/is-authenticated', {
+            const response = await fetch('http://localhost:5000/api/auth/isAuthenticated', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -125,32 +129,71 @@ export function AuthProvider({ children }) {
                 credentials: 'include',
             });
 
+            console.log('Auth check response:', response.status);
+
             if (response.ok) {
                 const data = await response.json();
+                console.log('Auth check data:', data);
+
                 if (data.authenticated) {
                     const userType = data.teacher ? 'teacher' : 'student';
                     const userData = data[userType];
+
+                    if (!userData) {
+                        console.error('No user data in response');
+                        return;
+                    }
 
                     const updatedUserData = {
                         id: userData.id,
                         name: userData.name,
                         email: userData.email,
-                        role: user?.role || 'student', // Keep existing role
+                        role: user?.role || (userType === 'teacher' ? (userData.email.toLowerCase().includes('admin') ? 'admin' : 'teacher') : 'student'),
                         avatar: userData.avatarUrl ? (userData.avatarUrl.startsWith('/uploads/') ? `${API_BASE_URL}${userData.avatarUrl}` : userData.avatarUrl) : user?.avatar,
                         ...(userType === 'student' && { badges: userData.badges || [] })
                     };
 
+                    console.log('Setting user data:', updatedUserData);
                     setUser(updatedUserData);
                     localStorage.setItem('user', JSON.stringify(updatedUserData));
+                } else {
+                    console.log('User not authenticated, clearing user data');
+                    setUser(null);
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
                 }
+            } else {
+                console.error('Auth check failed with status:', response.status);
+                // If auth check fails, clear user data
+                setUser(null);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
             }
         } catch (error) {
             console.error('Failed to refresh user data:', error);
+            // On error, don't clear user data immediately, but log the error
         }
-    };
+    }, [user?.role, user?.avatar]);
+
+    // Refresh user data on mount
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            refreshUser();
+        }
+    }, [refreshUser]);
+
+    // Memoize the context value to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({
+        user,
+        login,
+        registerStudent,
+        logout,
+        refreshUser
+    }), [user, login, registerStudent, logout, refreshUser]);
 
     return (
-        <AuthContext.Provider value={{ user, login, registerStudent, logout, refreshUser }}>
+        <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
     );

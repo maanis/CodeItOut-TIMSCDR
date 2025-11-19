@@ -69,6 +69,10 @@ export const useAnnouncements = () => {
     return useQuery({
         queryKey: ['announcements'],
         queryFn: fetchAnnouncements,
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        gcTime: 30 * 60 * 1000, // Cache kept for 30 minutes
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
     });
 };
 

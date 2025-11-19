@@ -5,6 +5,7 @@ A modern, responsive React frontend for the CodeItOut educational platform. Buil
 ## 🚀 Features
 
 ### Student Features
+
 - **Dashboard**: Personalized dashboard with quick access to contests and progress
 - **Contest System**: Browse available contests, join waiting rooms, take quizzes, and view results
 - **Project Management**: View assigned projects and track progress
@@ -14,6 +15,7 @@ A modern, responsive React frontend for the CodeItOut educational platform. Buil
 - **Settings**: Manage profile and preferences
 
 ### Admin Features
+
 - **Dashboard**: Comprehensive admin overview with statistics and quick actions
 - **Contest Management**: Create and manage quiz contests with AI-powered question generation
 - **Student Management**: View, edit, and manage student profiles
@@ -24,6 +26,7 @@ A modern, responsive React frontend for the CodeItOut educational platform. Buil
 - **Analytics**: View detailed analytics and reports
 
 ### Technical Features
+
 - **AI-Powered Question Generation**: Generate quiz questions using Google Gemini AI
 - **Real-time Updates**: Live contest status and notifications
 - **Responsive Design**: Mobile-first design that works on all devices
@@ -133,17 +136,20 @@ frontend/
 ## 🔧 Installation & Setup
 
 ### Prerequisites
+
 - Node.js (v18 or higher)
 - npm or bun package manager
 - Git
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd frontend
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 # Using npm
 npm install
@@ -153,6 +159,7 @@ bun install
 ```
 
 ### 3. Environment Configuration
+
 Copy the environment template and configure your variables:
 
 ```bash
@@ -160,6 +167,7 @@ cp .env.example .env
 ```
 
 Edit `.env` with your configuration:
+
 ```env
 # Gemini AI API Configuration
 # Get your API key from: https://makersuite.google.com/app/apikey
@@ -170,6 +178,7 @@ VITE_API_URL=http://localhost:5000/api
 ```
 
 ### 4. Start Development Server
+
 ```bash
 # Using npm
 npm run dev
@@ -223,12 +232,14 @@ The frontend integrates with the backend API using custom React hooks powered by
 ## 🎯 Key Features Implementation
 
 ### AI-Powered Question Generation
+
 - Integrated Google Gemini AI for automatic quiz question creation
 - Keyword-based prompt engineering
 - Difficulty level selection (easy, medium, hard)
 - JSON response parsing and validation
 
 ### Contest System
+
 - Real-time contest status updates
 - Waiting room functionality
 - Timed quiz interface
@@ -236,12 +247,14 @@ The frontend integrates with the backend API using custom React hooks powered by
 - Leaderboard generation
 
 ### Responsive Design
+
 - Mobile-first approach
 - Adaptive layouts for all screen sizes
 - Touch-friendly interactions
 - Optimized performance
 
 ### Theme System
+
 - Dark and light mode support
 - System preference detection
 - Smooth theme transitions
@@ -250,11 +263,13 @@ The frontend integrates with the backend API using custom React hooks powered by
 ## 🚀 Deployment
 
 ### Build for Production
+
 ```bash
 npm run build
 ```
 
 ### Environment Variables for Production
+
 Ensure these environment variables are set in your deployment platform:
 
 ```env
@@ -263,6 +278,7 @@ VITE_API_URL=https://your-api-domain.com/api
 ```
 
 ### Deployment Platforms
+
 - **Vercel**: Connect your GitHub repo for automatic deployments
 - **Netlify**: Drag & drop the `dist` folder or connect via Git
 - **Railway**: Deploy directly from GitHub
@@ -277,6 +293,7 @@ VITE_API_URL=https://your-api-domain.com/api
 5. Open a Pull Request
 
 ### Development Guidelines
+
 - Use TypeScript for all new components
 - Follow the existing component structure
 - Use the provided UI components from shadcn/ui
@@ -297,6 +314,7 @@ VITE_API_URL=https://your-api-domain.com/api
 ### Common Issues
 
 **Build Errors**
+
 ```bash
 # Clear node_modules and reinstall
 rm -rf node_modules package-lock.json
@@ -304,15 +322,18 @@ npm install
 ```
 
 **Environment Variables Not Loading**
+
 - Ensure variables start with `VITE_`
 - Restart the development server after changes
 
 **API Connection Issues**
+
 - Check that the backend is running on the correct port
 - Verify CORS configuration in the backend
 - Check network connectivity
 
 **Component Import Errors**
+
 - Ensure the component is exported from the correct file
 - Check the import path and alias configuration
 
@@ -323,6 +344,7 @@ This project is licensed under the MIT License.
 ## 🆘 Support
 
 For support and questions:
+
 - Create an issue in the repository
 - Check the troubleshooting section above
 - Review the backend API documentation
@@ -334,5 +356,5 @@ For support and questions:
 - **v1.1.0**: Added AI-powered question generation
 - **v1.2.0**: Enhanced admin dashboard and analytics
 - **v1.3.0**: Improved mobile responsiveness and theme system</content>
-<filePath>create_file">
-<parameter name="filePath">c:\Users\Asus TUF\Desktop\code it out\frontend\README.md
+  <filePath>create_file">
+  <parameter name="filePath">c:\Users\Asus TUF\Desktop\code it out\frontend\README.md

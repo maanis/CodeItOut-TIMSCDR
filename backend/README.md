@@ -19,6 +19,7 @@ A comprehensive backend API for the CodeItOut educational platform, built with N
 ## 🛠 Tech Stack
 
 ### Backend (Node.js)
+
 - **Runtime**: Node.js
 - **Framework**: Express.js v5.1.0
 - **Database**: MongoDB with Mongoose ODM
@@ -29,6 +30,7 @@ A comprehensive backend API for the CodeItOut educational platform, built with N
 - **Development**: Nodemon for hot reloading
 
 ### AI/ML (Python)
+
 - **Framework**: FastAPI
 - **Face Recognition**: FaceNet-PyTorch, MTCNN
 - **Computer Vision**: OpenCV, Pillow, scikit-image
@@ -92,28 +94,33 @@ backend/
 ## 🔧 Installation & Setup
 
 ### Prerequisites
+
 - Node.js (v16 or higher)
 - Python (v3.8 or higher)
 - MongoDB (local or cloud instance)
 - Git
 
 ### 1. Clone the Repository
+
 ```bash
 git clone <repository-url>
 cd backend
 ```
 
 ### 2. Install Node.js Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Install Python Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Environment Configuration
+
 Create a `.env` file in the root directory:
 
 ```env
@@ -123,16 +130,19 @@ JWT_SECRET=your_super_secret_jwt_key_here
 ```
 
 ### 5. Start MongoDB
+
 Ensure MongoDB is running on your system or update the `MONGO_URI` to point to your MongoDB instance.
 
 ### 6. Start the Services
 
 #### Start the Node.js Backend
+
 ```bash
 npm run dev
 ```
 
 #### Start the Face Recognition API (Python)
+
 ```bash
 # Option 1: Using Python directly
 python app.py
@@ -146,11 +156,13 @@ The Node.js server will run on `http://localhost:5000` and the FastAPI service o
 ## 🌐 API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/login` - User login
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/logout` - User logout
 
 ### Students
+
 - `GET /api/students` - Get all students
 - `GET /api/students/:id` - Get student by ID
 - `POST /api/students` - Create new student
@@ -158,6 +170,7 @@ The Node.js server will run on `http://localhost:5000` and the FastAPI service o
 - `DELETE /api/students/:id` - Delete student
 
 ### Quiz System
+
 - `GET /api/quiz` - Get all quizzes
 - `POST /api/quiz` - Create new quiz
 - `GET /api/quiz/:id` - Get quiz by ID
@@ -166,40 +179,48 @@ The Node.js server will run on `http://localhost:5000` and the FastAPI service o
 - `POST /api/quiz/:id/submit` - Submit quiz attempt
 
 ### Face Recognition
+
 - `POST /api/face/recognize` - Recognize face from image
 - `POST /api/face/register` - Register new face
 
 ### Projects
+
 - `GET /api/projects` - Get all projects
 - `POST /api/projects` - Create new project
 - `GET /api/projects/:id` - Get project by ID
 - `PUT /api/projects/:id` - Update project
 
 ### Events
+
 - `GET /api/events` - Get all events
 - `POST /api/events` - Create new event
 - `GET /api/events/:id` - Get event by ID
 - `PUT /api/events/:id` - Update event
 
 ### Announcements
+
 - `GET /api/announcements` - Get all announcements
 - `POST /api/announcements` - Create new announcement
 - `GET /api/announcements/:id` - Get announcement by ID
 
 ### Badges
+
 - `GET /api/badges` - Get all badges
 - `POST /api/badges` - Create new badge
 - `GET /api/badges/:id` - Get badge by ID
 
 ### Notifications
+
 - `GET /api/notifications` - Get user notifications
 - `POST /api/notifications` - Create notification
 - `PUT /api/notifications/:id/read` - Mark notification as read
 
 ### File Upload
+
 - `POST /api/upload` - Upload files
 
 ### Health Check
+
 - `GET /api/health` - API health status
 
 ## 🔐 Authentication
@@ -213,6 +234,7 @@ Authorization: Bearer <your-jwt-token>
 ## 📊 Database Models
 
 ### Student
+
 - Personal information (name, email, etc.)
 - Academic details
 - Face embeddings for recognition
@@ -220,23 +242,27 @@ Authorization: Bearer <your-jwt-token>
 - Badge collections
 
 ### Quiz
+
 - Questions with multiple choice options
 - Scoring system
 - Time limits
 - Attempt tracking
 
 ### Project
+
 - Project details and descriptions
 - Student assignments
 - Submission tracking
 - Evaluation scores
 
 ### Event
+
 - Event scheduling
 - Participant management
 - Event categories
 
 ### Badge
+
 - Achievement system
 - Gamification features
 - Progress tracking
@@ -244,6 +270,7 @@ Authorization: Bearer <your-jwt-token>
 ## 🚀 Deployment
 
 ### Production Considerations
+
 1. Set secure environment variables
 2. Configure MongoDB for production
 3. Set up proper CORS origins
@@ -252,6 +279,7 @@ Authorization: Bearer <your-jwt-token>
 6. Set up monitoring and alerts
 
 ### Docker Support
+
 Add Dockerfile and docker-compose.yml for containerized deployment.
 
 ## 🤝 Contributing
@@ -269,6 +297,7 @@ This project is licensed under the ISC License.
 ## 🆘 Support
 
 For support and questions:
+
 - Create an issue in the repository
 - Contact the development team
 - Check the documentation for common solutions

@@ -1,58 +1,76 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-export const useNotifications = () => {
-    const [data, setData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [unreadCount, setUnreadCount] = useState(0);
+const fetchNotifications = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error('No authentication token found');
+    }
 
-    const fetchNotifications = async () => {
-        try {
-            setIsLoading(true);
-            const response = await fetch(`${API_BASE_URL}/api/notifications`, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch notifications');
-            }
-
-            const result = await response.json();
-            setData(result.notifications || []);
-            setUnreadCount(result.notifications?.filter(n => !n.hasRead).length || 0);
-            setError(null);
-        } catch (error) {
-            console.error('Fetch notifications error:', error);
-            setError(error.message);
-            toast.error('Failed to load notifications');
-        } finally {
-            setIsLoading(false);
+    const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
         }
-    };
+    });
+
+    if (!response.ok) {
+        if (response.status === 401) {
+            throw new Error('Authentication failed. Please log in again.');
+        }
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    return await response.json();
+};
+
+export const useNotifications = () => {
+    const token = localStorage.getItem('token');
+    
+    const { data: queryData, isLoading, error, refetch } = useQuery({
+        queryKey: ['notifications'],
+        queryFn: fetchNotifications,
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        gcTime: 30 * 60 * 1000, // Cache kept for 30 minutes
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
+        enabled: !!token,
+    });
+
+    const data = queryData?.notifications || [];
+    const unreadCount = data?.filter(n => !n.hasRead).length || 0;
+
 
     const markAsRead = async (notificationId) => {
         try {
+            if (!token) {
+                toast.error('Authentication required');
+                return;
+            }
+
             const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}/read`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
             if (!response.ok) {
-                throw new Error('Failed to mark notification as read');
+                if (response.status === 401) {
+                    toast.error('Authentication failed');
+                } else {
+                    throw new Error('Failed to mark notification as read');
+                }
+                return;
             }
 
-            // Update local state
-            setData(prev => prev.map(n =>
-                n._id === notificationId ? { ...n, hasRead: true } : n
-            ));
-            setUnreadCount(prev => Math.max(0, prev - 1));
+            // Refetch to update the cache
+            await refetch();
         } catch (error) {
             console.error('Mark as read error:', error);
             toast.error('Failed to mark notification as read');
@@ -61,20 +79,30 @@ export const useNotifications = () => {
 
     const markAllAsRead = async () => {
         try {
+            if (!token) {
+                toast.error('Authentication required');
+                return;
+            }
+
             const response = await fetch(`${API_BASE_URL}/api/notifications/mark-all-read`, {
                 method: 'PUT',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
             if (!response.ok) {
-                throw new Error('Failed to mark all notifications as read');
+                if (response.status === 401) {
+                    toast.error('Authentication failed');
+                } else {
+                    throw new Error('Failed to mark all notifications as read');
+                }
+                return;
             }
 
-            // Update local state
-            setData(prev => prev.map(n => ({ ...n, hasRead: true })));
-            setUnreadCount(0);
+            // Refetch to update the cache
+            await refetch();
         } catch (error) {
             console.error('Mark all as read error:', error);
             toast.error('Failed to mark all notifications as read');
@@ -83,33 +111,39 @@ export const useNotifications = () => {
 
     const getUnreadCount = async () => {
         try {
+            if (!token) {
+                return;
+            }
+
             const response = await fetch(`${API_BASE_URL}/api/notifications/unread-count`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
             if (!response.ok) {
-                throw new Error('Failed to get unread count');
+                if (response.status === 401) {
+                    console.warn('Authentication failed for unread count');
+                } else {
+                    throw new Error('Failed to get unread count');
+                }
+                return;
             }
 
             const result = await response.json();
-            setUnreadCount(result.count || 0);
+            return result.count || 0;
         } catch (error) {
             console.error('Get unread count error:', error);
         }
     };
-
-    useEffect(() => {
-        fetchNotifications();
-    }, []);
 
     return {
         data,
         isLoading,
         error,
         unreadCount,
-        refetch: fetchNotifications,
+        refetch,
         markAsRead,
         markAllAsRead,
         getUnreadCount

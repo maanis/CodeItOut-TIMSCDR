@@ -2,55 +2,9 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Teacher = require('../models/Teacher');
 const Student = require('../models/Student');
-const axios = require('axios');
-const FormData = require('form-data');
 const fs = require('fs');
 const path = require('path');
-
-// Python face recognition API URL (adjust port as needed)
-const FACE_API_URL = process.env.FACE_API_URL || 'http://localhost:8000';
-
-// Helper function to extract face embeddings from image
-const extractFaceEmbeddings = async (imagePath) => {
-    try {
-        const formData = new FormData();
-
-        // Read image file
-        const imageBuffer = fs.readFileSync(imagePath);
-        formData.append('file', imageBuffer, {
-            filename: 'face.jpg',
-            contentType: 'image/jpeg'
-        });
-
-        const response = await axios.post(`${FACE_API_URL}/extract-embeddings/`, formData, {
-            headers: {
-                ...formData.getHeaders(),
-            },
-            timeout: 30000, // 30 second timeout
-        });
-
-        console.log('FastApi res', response.data);
-
-        if (response.data.success && response.data.embeddings) {
-            return {
-                success: true,
-                embeddings: response.data.embeddings,
-                dimensions: response.data.dimensions
-            };
-        } else {
-            return {
-                success: false,
-                error: response.data.error || 'Face extraction failed'
-            };
-        }
-    } catch (error) {
-        console.error('Face extraction API error:', error.message);
-        return {
-            success: false,
-            error: error.response?.data?.error || 'Face recognition service unavailable'
-        };
-    }
-};
+const sharp = require('sharp');
 
 const register = async (req, res) => {
     try {
@@ -143,7 +97,7 @@ const registerStudent = async (req, res) => {
 
         // Check if image file is uploaded
         if (!req.file) {
-            return res.status(400).json({ error: 'Profile image is required for face recognition' });
+            return res.status(400).json({ error: 'Profile image is required' });
         }
 
         // Check if student already exists by email
@@ -158,19 +112,9 @@ const registerStudent = async (req, res) => {
             return res.status(400).json({ error: 'Roll number already registered' });
         }
 
-        // Extract face embeddings from uploaded image
-        const faceResult = await extractFaceEmbeddings(req.file.path);
-        if (!faceResult.success) {
-            // Clean up uploaded file if face extraction fails
-            if (fs.existsSync(req.file.path)) {
-                fs.unlinkSync(req.file.path);
-            }
-            return res.status(400).json({ error: faceResult.error });
-        }
-
         // Generate unique filename for avatar
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        const avatarFilename = `student-${uniqueSuffix}${path.extname(req.file.originalname)}`;
+        const avatarFilename = `student-${uniqueSuffix}.jpg`;
         const avatarPath = path.join(__dirname, '../../uploads', avatarFilename);
 
         // Ensure uploads directory exists
@@ -179,28 +123,42 @@ const registerStudent = async (req, res) => {
             fs.mkdirSync(uploadsDir, { recursive: true });
         }
 
-        // Move uploaded file to uploads folder
+        // Compress and save image using sharp
         try {
-            fs.renameSync(req.file.path, avatarPath);
+            await sharp(req.file.path)
+                .resize(400, 400, {
+                    fit: 'cover',
+                    position: 'center'
+                })
+                .jpeg({ quality: 80, progressive: true })
+                .toFile(avatarPath);
+
+            // Clean up temp file asynchronously to avoid permission issues
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.warn('Could not delete temp file:', req.file.path, err.message);
+                }
+            });
         } catch (error) {
-            console.error('Error moving avatar file:', error);
-            // Clean up temp file
-            if (fs.existsSync(req.file.path)) {
-                fs.unlinkSync(req.file.path);
-            }
-            return res.status(500).json({ error: 'Failed to save avatar image' });
+            console.error('Error compressing avatar file:', error);
+            // Clean up temp file asynchronously
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.warn('Could not delete temp file:', req.file.path, err.message);
+                }
+            });
+            return res.status(500).json({ error: 'Failed to process avatar image' });
         }
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Create new student with face embeddings and avatar URL
+        // Create new student with compressed avatar URL
         const student = new Student({
             name: name.trim(),
             roll: roll.toUpperCase().trim(),
             email: email.toLowerCase().trim(),
             password: hashedPassword,
-            faceEmbeddings: faceResult.embeddings,
             avatarUrl: `/uploads/${avatarFilename}`
         });
 
@@ -231,15 +189,18 @@ const registerStudent = async (req, res) => {
                 email: student.email,
                 badges: student.badges || [],
                 projects: student.approvedProjects || [],
-                avatarUrl: student.avatarUrl,
-                hasFaceEmbeddings: student.faceEmbeddings && student.faceEmbeddings.length > 0
+                avatarUrl: student.avatarUrl
             }
         });
     } catch (error) {
         console.error('Student registration error:', error);
-        // Clean up uploaded file in case of error
-        if (req.file && fs.existsSync(req.file.path)) {
-            fs.unlinkSync(req.file.path);
+        // Clean up uploaded file in case of error (asynchronously)
+        if (req.file) {
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.warn('Could not delete temp file:', req.file.path, err.message);
+                }
+            });
         }
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -295,7 +256,7 @@ const login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         });
 
-        console.log('Login successful:', { token, user });
+        // console.log('Login successful:', { token, user });
 
         res.json({
             message: 'Login successful',
@@ -372,8 +333,7 @@ const isAuthenticated = async (req, res) => {
                     ...(userType === 'student' && {
                         roll: user.roll,
                         badges: user.badges || [],
-                        avatarUrl: user.avatarUrl,
-                        hasFaceEmbeddings: user.faceEmbeddings && user.faceEmbeddings.length > 0
+                        avatarUrl: user.avatarUrl
                     })
                 }
             });

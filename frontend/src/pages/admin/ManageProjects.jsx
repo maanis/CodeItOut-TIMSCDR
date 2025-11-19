@@ -54,11 +54,18 @@ const ManageProjects = () => {
     };
 
     const getStatusBadge = (approved) => {
-        if (approved) {
+        if (approved === true) {
             return (
                 <Badge className="bg-green-500 hover:bg-green-600 text-white">
                     <Check className="w-3 h-3 mr-1" />
                     Approved
+                </Badge>
+            );
+        } else if (approved === false) {
+            return (
+                <Badge className="bg-red-500 hover:bg-red-600 text-white">
+                    <X className="w-3 h-3 mr-1" />
+                    Rejected
                 </Badge>
             );
         } else {
@@ -188,7 +195,7 @@ const ManageProjects = () => {
                                     >
                                         <Eye className="w-4 h-4" />
                                     </Button>
-                                    {!project.approved && (
+                                    {!project.approved && project.approved !== false && (
                                         <>
                                             <Button
                                                 variant="ghost"

@@ -111,11 +111,18 @@ const Projects = () => {
     };
 
     const getStatusBadge = (approved) => {
-        if (approved) {
+        if (approved === true) {
             return (
                 <Badge variant="default" className="bg-green-500 hover:bg-green-600">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Approved
+                </Badge>
+            );
+        } else if (approved === false) {
+            return (
+                <Badge variant="destructive" className="bg-red-500 hover:bg-red-600">
+                    <X className="w-3 h-3 mr-1" />
+                    Rejected
                 </Badge>
             );
         } else {

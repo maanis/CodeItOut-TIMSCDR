@@ -15,7 +15,8 @@ import {
     Target,
     LogOut,
     Menu,
-    X
+    X,
+    FileText
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ const navItems = [
     { icon: Users, label: 'Students', path: '/admin/students' },
     { icon: UserCheck, label: 'Community', path: '/admin/community' },
     { icon: Trophy, label: 'Leaderboard', path: '/admin/leaderboard' },
+    { icon: FileText, label: 'Logs', path: '/admin/logs' },
     // { icon: Settings, label: 'Settings', path: '/admin/settings' },
 ];
 

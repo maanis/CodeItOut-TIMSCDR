@@ -24,11 +24,6 @@ const studentSchema = new mongoose.Schema({
         trim: true,
         uppercase: true
     },
-    faceEmbeddings: {
-        type: [Number], // Array of numbers for face recognition embeddings
-        default: [],
-        required: true,
-    },
     avatarUrl: {
         type: String,
         default: null

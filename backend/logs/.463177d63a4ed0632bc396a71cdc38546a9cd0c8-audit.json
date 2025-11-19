@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "C:\\Users\\Asus TUF\\Desktop\\code it out\\backend\\logs\\.463177d63a4ed0632bc396a71cdc38546a9cd0c8-audit.json",
+    "files": [
+        {
+            "date": 1763570052101,
+            "name": "C:\\Users\\Asus TUF\\Desktop\\code it out\\backend\\logs\\error-2025-11-19.log",
+            "hash": "d4a6439d3fa7044d6fdf8432b5b19ee4500f8b8607a2c87261895c8027c9d449"
+        }
+    ],
+    "hashType": "sha256"
+}

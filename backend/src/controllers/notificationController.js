@@ -1,11 +1,14 @@
 const Notification = require('../models/Notification');
+const mongoose = require('mongoose');
 
 // @desc    Get notifications for a user
 // @route   GET /api/notifications
 // @access  Private
 const getNotifications = async (req, res) => {
     try {
-        const userId = req.user.id;
+
+        console.log('innn')
+        const userId = new mongoose.Types.ObjectId(req.user.id);
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page - 1) * limit;
@@ -13,8 +16,7 @@ const getNotifications = async (req, res) => {
         const notifications = await Notification.find({ userId })
             .sort({ createdAt: -1 })
             .skip(skip)
-            .limit(limit)
-            .populate('userId', 'name email');
+            .limit(limit);
 
         const total = await Notification.countDocuments({ userId });
 
@@ -38,7 +40,7 @@ const getNotifications = async (req, res) => {
 // @access  Private
 const getUnreadCount = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = new mongoose.Types.ObjectId(req.user.id);
         const count = await Notification.countDocuments({ userId, hasRead: false });
 
         res.json({ count });
@@ -53,7 +55,7 @@ const getUnreadCount = async (req, res) => {
 // @access  Private
 const markAsRead = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = new mongoose.Types.ObjectId(req.user.id);
         const notificationId = req.params.id;
 
         const notification = await Notification.findOneAndUpdate(
@@ -81,7 +83,7 @@ const markAsRead = async (req, res) => {
 // @access  Private
 const markAllAsRead = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = new mongoose.Types.ObjectId(req.user.id);
 
         const result = await Notification.updateMany(
             { userId, hasRead: false },
@@ -112,7 +114,7 @@ const createNotification = async (req, res) => {
         const notification = new Notification({
             title,
             content,
-            userId,
+            userId: new mongoose.Types.ObjectId(userId),
             type: type || 'system'
         });
 
@@ -133,7 +135,7 @@ const createNotification = async (req, res) => {
 // @access  Private
 const deleteNotification = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = new mongoose.Types.ObjectId(req.user.id);
         const notificationId = req.params.id;
 
         const notification = await Notification.findOneAndDelete({

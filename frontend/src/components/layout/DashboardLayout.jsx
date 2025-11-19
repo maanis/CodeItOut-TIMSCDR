@@ -17,11 +17,13 @@ const DashboardLayout = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const { data: notifications = [], isLoading: notificationsLoading, unreadCount, markAllAsRead } = useNotifications();
-
+    console.log(notifications)
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const notificationsRef = useRef();
     const userMenuRef = useRef();
+
+    console.log(user.avatar)
 
     useEffect(() => {
         const handleClickOutside = (event) => {

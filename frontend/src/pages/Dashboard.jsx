@@ -38,9 +38,9 @@ const Dashboard = () => {
     const myProjects = myProjectsData || [];
 
     // Fetch latest user data on component mount
-    useEffect(() => {
-        refreshUser();
-    }, [refreshUser]);
+    // useEffect(() => {
+    //     refreshUser();
+    // }, [refreshUser]);
 
     const handleLogout = () => {
         logout();
