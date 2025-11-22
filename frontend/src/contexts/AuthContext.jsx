@@ -136,13 +136,15 @@ export function AuthProvider({ children }) {
                 console.log('Auth check data:', data);
 
                 if (data.authenticated) {
-                    const userType = data.teacher ? 'teacher' : 'student';
-                    const userData = data[userType];
+                    // const userType = data.teacher ? 'teacher' : 'student';
+                    // const userData = data[userType];
 
-                    if (!userData) {
-                        console.error('No user data in response');
-                        return;
-                    }
+                    // if (!userData) {
+                    //     console.error('No user data in response');
+                    //     return;
+                    // }
+                    const userData = data.user;
+                    const userType = data.user.role;
 
                     const updatedUserData = {
                         id: userData.id,

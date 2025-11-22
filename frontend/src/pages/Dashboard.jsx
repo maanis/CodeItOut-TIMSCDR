@@ -1,46 +1,33 @@
 import { motion } from 'framer-motion';
-import { Calendar, Trophy, Code2, Flame, Bell, TrendingUp } from 'lucide-react';
+import { Calendar, Trophy, Code2, Flame, Bell } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import StatCard from '@/components/dashboard/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useAnnouncements } from '@/hooks/useAnnouncements';
-import { useEvents } from '@/hooks/useEvents';
-import { useMyProjects } from '@/hooks/useProjects';
-
+import { useDashboard } from '@/hooks/useDashboard';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 
-// const mockLeaderboard = [
-//     { rank: 1, name: 'Alex Chen', points: 2450, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex' },
-//     { rank: 2, name: 'Sarah Kim', points: 2380, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah' },
-//     { rank: 3, name: 'Mike Johnson', points: 2210, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike' },
-//     { rank: 4, name: 'Emma Wilson', points: 2150, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Emma' },
-//     { rank: 5, name: 'David Lee', points: 2100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=David' },
-// ];
-
-const mockProjects = [
-    { id: 1, title: 'E-commerce Website', status: 'Submitted', score: 95 },
-    { id: 2, title: 'Weather App', status: 'In Review', score: null },
-];
 
 const Dashboard = () => {
-
-    const { user, logout, refreshUser } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
-    const { data: announcements = [], isLoading: announcementsLoading, error: announcementsError } = useAnnouncements();
-    const { data: events = [], isLoading: eventsLoading, error: eventsError } = useEvents();
-    const { data: myProjectsData, isLoading: projectsLoading, error: projectsError } = useMyProjects();
+    const {
+        data: dashboardData,
+        isLoading,
+        error
+    } = useDashboard();
 
-    // Get projects from API response
-    console.log(myProjectsData)
-    const myProjects = myProjectsData || [];
+    const counts = dashboardData?.counts || {
+        events: 0,
+        badgesEarned: 0,
+        projectsSubmitted: 0,
+        totalPoints: 0
+    };
 
-    // Fetch latest user data on component mount
-    // useEffect(() => {
-    //     refreshUser();
-    // }, [refreshUser]);
+    const announcements = dashboardData?.announcements || [];
+    const events = dashboardData?.events || [];
+    const projects = dashboardData?.projects || [];
 
     const handleLogout = () => {
         logout();
@@ -67,10 +54,10 @@ const Dashboard = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard icon={Calendar} label="Events" value={events.length} index={0} gradient="gradient-primary" />
-                <StatCard icon={Trophy} label="Badges Earned" value={user?.badges?.length || 0} index={1} gradient="gradient-accent" />
-                <StatCard icon={Code2} label="Projects Submitted" value={myProjects.length} index={2} gradient="gradient-success" />
-                <StatCard icon={Flame} label="Total Points" value={user?.badges?.reduce((sum, badge) => sum + (badge?.points || 0), 0) || 0} index={3} gradient="gradient-primary" />
+                <StatCard icon={Calendar} label="Events" value={counts.events} index={0} gradient="gradient-primary" />
+                <StatCard icon={Trophy} label="Badges Earned" value={counts.badgesEarned} index={1} gradient="gradient-accent" />
+                <StatCard icon={Code2} label="Projects Submitted" value={counts.projectsSubmitted} index={2} gradient="gradient-success" />
+                <StatCard icon={Flame} label="Total Points" value={counts.totalPoints} index={3} gradient="gradient-primary" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -83,7 +70,7 @@ const Dashboard = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {announcementsLoading ? (
+                        {isLoading ? (
                             // Loading skeleton
                             Array.from({ length: 3 }).map((_, index) => (
                                 <motion.div
@@ -97,7 +84,7 @@ const Dashboard = () => {
                                     <div className="h-3 bg-muted rounded w-1/2 animate-pulse"></div>
                                 </motion.div>
                             ))
-                        ) : announcementsError ? (
+                        ) : error ? (
                             <div className="text-center py-4">
                                 <p className="text-sm text-muted-foreground">Failed to load announcements</p>
                             </div>
@@ -134,7 +121,7 @@ const Dashboard = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {eventsLoading ? (
+                        {isLoading ? (
                             // Loading skeleton
                             Array.from({ length: 3 }).map((_, index) => (
                                 <motion.div
@@ -152,7 +139,7 @@ const Dashboard = () => {
                                     <div className="h-3 bg-muted rounded w-1/2 animate-pulse"></div>
                                 </motion.div>
                             ))
-                        ) : eventsError ? (
+                        ) : error ? (
                             <div className="text-center py-4">
                                 <p className="text-sm text-muted-foreground">Failed to load events</p>
                             </div>
@@ -161,30 +148,27 @@ const Dashboard = () => {
                                 <p className="text-sm text-muted-foreground">No events available</p>
                             </div>
                         ) : (
-                            events
-                                // .filter(event => event.status === 'Upcoming')
-                                .slice(0, 3)
-                                .map((event, index) => (
-                                    <motion.div
-                                        key={event._id}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        whileHover={{ scale: 1.02 }}
-                                        className="p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
-                                    >
-                                        <div className="flex items-start justify-between mb-2">
-                                            <h4 className="font-semibold">{event.title}</h4>
-                                            <Badge variant={event.status === 'Ongoing' ? 'default' : 'secondary'} className="text-xs">
-                                                {event.status}
-                                            </Badge>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground mb-2">{event.description}</p>
-                                        <p className="text-xs text-muted-foreground">
-                                            Created: {new Date(event.createdAt).toLocaleDateString()}
-                                        </p>
-                                    </motion.div>
-                                ))
+                            events.slice(0, 3).map((event, index) => (
+                                <motion.div
+                                    key={event._id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: index * 0.1 }}
+                                    whileHover={{ scale: 1.02 }}
+                                    className="p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                                >
+                                    <div className="flex items-start justify-between mb-2">
+                                        <h4 className="font-semibold">{event.title}</h4>
+                                        <Badge variant={event.status === 'Ongoing' ? 'default' : 'secondary'} className="text-xs">
+                                            {event.status}
+                                        </Badge>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mb-2">{event.description}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                        Created: {new Date(event.createdAt).toLocaleDateString()}
+                                    </p>
+                                </motion.div>
+                            ))
                         )}
                     </CardContent>
                 </Card>
@@ -198,7 +182,7 @@ const Dashboard = () => {
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        {projectsLoading ? (
+                        {isLoading ? (
                             // Loading skeleton
                             Array.from({ length: 2 }).map((_, index) => (
                                 <motion.div
@@ -213,16 +197,16 @@ const Dashboard = () => {
                                     <div className="h-8 bg-muted rounded animate-pulse"></div>
                                 </motion.div>
                             ))
-                        ) : projectsError ? (
+                        ) : error ? (
                             <div className="text-center py-4">
                                 <p className="text-sm text-muted-foreground">Failed to load projects</p>
                             </div>
-                        ) : myProjects.length === 0 ? (
+                        ) : projects.length === 0 ? (
                             <div className="text-center py-4">
                                 <p className="text-sm text-muted-foreground">No projects submitted yet</p>
                             </div>
                         ) : (
-                            myProjects.slice(0, 2).map((project, index) => (
+                            projects.slice(0, 2).map((project, index) => (
                                 <motion.div
                                     key={project._id}
                                     initial={{ opacity: 0, x: -20 }}
@@ -232,14 +216,6 @@ const Dashboard = () => {
                                     className="p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
                                 >
                                     <h4 className="font-semibold mb-2">{project.title}</h4>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <Badge variant={project.approved ? "default" : "outline"}>
-                                            {project.approved ? "Approved" : "Pending"}
-                                        </Badge>
-                                        {project.score && (
-                                            <span className="text-sm font-medium text-success">{project.score}%</span>
-                                        )}
-                                    </div>
                                     <Button size="sm" variant="ghost" onClick={() => navigate('projects')} className="w-full">
                                         View Details
                                     </Button>

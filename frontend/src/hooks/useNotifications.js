@@ -10,7 +10,7 @@ const fetchNotifications = async () => {
         throw new Error('No authentication token found');
     }
 
-    const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+    const response = await fetch(`${API_BASE_URL}/notifications`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -52,7 +52,7 @@ export const useNotifications = () => {
                 return;
             }
 
-            const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}/read`, {
+            const response = await fetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -84,7 +84,7 @@ export const useNotifications = () => {
                 return;
             }
 
-            const response = await fetch(`${API_BASE_URL}/api/notifications/mark-all-read`, {
+            const response = await fetch(`${API_BASE_URL}/notifications/mark-all-read`, {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${token}`,

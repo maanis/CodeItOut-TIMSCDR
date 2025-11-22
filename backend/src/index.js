@@ -4,8 +4,10 @@ const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const connectDB = require('./config/db');
+const redis = require('./config/redis');
 const path = require('path');
 const { logger, httpLogger } = require('./config/logger');
+const { initializeEmailService } = require('./config/emailService');
 
 // Import models to register them with Mongoose
 require('./models/Student');
@@ -30,11 +32,12 @@ const badgeRoutes = require('./routes/badgeRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const logsRoutes = require('./routes/logsRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 const app = express();
 
 // Pino HTTP request logging middleware (should be one of the first)
-app.use(httpLogger);
+// app.use(httpLogger);
 
 // Middleware
 app.use(bodyParser.json({ limit: '10mb' }));
@@ -76,6 +79,10 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/quizzes', quizRoutes);
 app.use('/api/contests', quizRoutes);
 app.use('/api/logs', logsRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
+// Initialize email service
+initializeEmailService();
 
 // Connect to DB
 connectDB();

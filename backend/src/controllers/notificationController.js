@@ -1,36 +1,44 @@
 const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
+const redis = require('../config/redis');
+const { logger } = require('../config/logger');
 
 // @desc    Get notifications for a user
 // @route   GET /api/notifications
 // @access  Private
 const getNotifications = async (req, res) => {
     try {
+        const userId = req.user.id;
+        const cacheKey = `notification:${userId}`;
 
-        console.log('innn')
-        const userId = new mongoose.Types.ObjectId(req.user.id);
-        const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 20;
-        const skip = (page - 1) * limit;
+        // Try to get from cache
+        const cachedNotifications = await redis.get(cacheKey);
+        if (cachedNotifications) {
+            logger.info(`Notifications retrieved from cache for user ${userId}`);
+            return res.json({
+                notifications: JSON.parse(cachedNotifications)
+            });
+        }
 
-        const notifications = await Notification.find({ userId })
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+
+        // Get 10 latest notifications with only required fields
+        const notifications = await Notification.find({ userId: userObjectId })
+            .select('content hasRead type _id createdAt')
             .sort({ createdAt: -1 })
-            .skip(skip)
-            .limit(limit);
+            .limit(10)
+            .lean();
 
-        const total = await Notification.countDocuments({ userId });
+        // Cache for 5 minutes (300 seconds)
+        await redis.setex(cacheKey, 300, JSON.stringify(notifications));
+
+        logger.info(`Notifications retrieved from database for user ${userId}`);
 
         res.json({
-            notifications,
-            pagination: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit)
-            }
+            notifications
         });
     } catch (error) {
-        console.error('Get notifications error:', error);
+        logger.error(`Get notifications error: ${error.message}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -45,7 +53,7 @@ const getUnreadCount = async (req, res) => {
 
         res.json({ count });
     } catch (error) {
-        console.error('Get unread count error:', error);
+        logger.error(`Get unread count error: ${error.message}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -55,11 +63,13 @@ const getUnreadCount = async (req, res) => {
 // @access  Private
 const markAsRead = async (req, res) => {
     try {
-        const userId = new mongoose.Types.ObjectId(req.user.id);
+        const userId = req.user.id;
+        const userObjectId = new mongoose.Types.ObjectId(userId);
         const notificationId = req.params.id;
+        const cacheKey = `notification:${userId}`;
 
         const notification = await Notification.findOneAndUpdate(
-            { _id: notificationId, userId },
+            { _id: notificationId, userId: userObjectId },
             { hasRead: true },
             { new: true }
         );
@@ -68,12 +78,15 @@ const markAsRead = async (req, res) => {
             return res.status(404).json({ error: 'Notification not found' });
         }
 
+        // Invalidate cache
+        await redis.del(cacheKey);
+
         res.json({
             message: 'Notification marked as read',
             notification
         });
     } catch (error) {
-        console.error('Mark as read error:', error);
+        logger.error(`Mark as read error: ${error.message}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -83,19 +96,24 @@ const markAsRead = async (req, res) => {
 // @access  Private
 const markAllAsRead = async (req, res) => {
     try {
-        const userId = new mongoose.Types.ObjectId(req.user.id);
+        const userId = req.user.id;
+        const userObjectId = new mongoose.Types.ObjectId(userId);
+        const cacheKey = `notification:${userId}`;
 
         const result = await Notification.updateMany(
-            { userId, hasRead: false },
+            { userId: userObjectId, hasRead: false },
             { hasRead: true }
         );
+
+        // Invalidate cache
+        await redis.del(cacheKey);
 
         res.json({
             message: 'All notifications marked as read',
             modifiedCount: result.modifiedCount
         });
     } catch (error) {
-        console.error('Mark all as read error:', error);
+        logger.error(`Mark all as read error: ${error.message}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -120,12 +138,18 @@ const createNotification = async (req, res) => {
 
         await notification.save();
 
+        // Invalidate cache for the user
+        const cacheKey = `notification:${userId}`;
+        await redis.del(cacheKey);
+
+        logger.info(`Notification created for user ${userId}`);
+
         res.status(201).json({
             message: 'Notification created successfully',
             notification
         });
     } catch (error) {
-        console.error('Create notification error:', error);
+        logger.error(`Create notification error: ${error.message}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -135,21 +159,28 @@ const createNotification = async (req, res) => {
 // @access  Private
 const deleteNotification = async (req, res) => {
     try {
-        const userId = new mongoose.Types.ObjectId(req.user.id);
+        const userId = req.user.id;
+        const userObjectId = new mongoose.Types.ObjectId(userId);
         const notificationId = req.params.id;
+        const cacheKey = `notification:${userId}`;
 
         const notification = await Notification.findOneAndDelete({
             _id: notificationId,
-            userId
+            userId: userObjectId
         });
 
         if (!notification) {
             return res.status(404).json({ error: 'Notification not found' });
         }
 
+        // Invalidate cache
+        await redis.del(cacheKey);
+
+        logger.info(`Notification ${notificationId} deleted for user ${userId}`);
+
         res.json({ message: 'Notification deleted successfully' });
     } catch (error) {
-        console.error('Delete notification error:', error);
+        logger.error(`Delete notification error: ${error.message}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

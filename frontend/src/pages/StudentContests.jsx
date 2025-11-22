@@ -10,7 +10,11 @@ import { useContests } from '@/hooks/useContests';
 import { useNavigate } from 'react-router-dom';
 
 const StudentContests = () => {
-    const { data: contests = [], isLoading, error } = useContests();
+    const [page, setPage] = useState(1);
+    const limit = 10;
+    const { data, isLoading, error } = useContests(page, limit);
+    const contests = data?.quizzes || [];
+    const pagination = data?.pagination || { page: 1, pages: 1 };
     const navigate = useNavigate();
 
     const handleJoinContest = (contestId, status) => {
@@ -144,6 +148,17 @@ const StudentContests = () => {
                     ))
                 )}
             </div>
+            {pagination && pagination.pages > 1 && (
+                <div className="flex items-center justify-center gap-4 mt-4">
+                    <Button disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))}>
+                        Previous
+                    </Button>
+                    <span className="text-sm text-muted-foreground">Page {pagination.page} of {pagination.pages}</span>
+                    <Button disabled={page >= pagination.pages} onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}>
+                        Next
+                    </Button>
+                </div>
+            )}
         </div>
     );
 };

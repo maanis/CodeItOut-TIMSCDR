@@ -3,6 +3,8 @@ const QuizAttempt = require('../models/QuizAttempt');
 const Student = require('../models/Student');
 const Notification = require('../models/Notification');
 const mongoose = require('mongoose');
+const redis = require('../config/redis');
+const { logger } = require('../config/logger');
 
 // @desc    Create a new quiz
 // @route   POST /api/quizzes
@@ -67,13 +69,47 @@ const createQuiz = async (req, res) => {
 // @access  Public
 const getQuizzes = async (req, res) => {
     try {
-        const quizzes = await Quiz.find()
-            .populate('createdBy', 'name email')
-            .sort({ createdAt: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
 
-        res.json(quizzes);
+        const cacheKey = `getAllQuiz:page:${page}:limit:${limit}`;
+
+        // Try cache
+        const cached = await redis.get(cacheKey);
+        if (cached) {
+            logger.info(`Quizzes (page ${page}) served from cache`);
+            return res.json(JSON.parse(cached));
+        }
+
+        // Select only required fields
+        const quizzes = await Quiz.find()
+            .select('_id title description timer status createdAt')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        const total = await Quiz.countDocuments();
+        const pages = Math.ceil(total / limit);
+
+        const payload = {
+            quizzes,
+            pagination: {
+                page,
+                limit,
+                total,
+                pages
+            }
+        };
+
+        // Cache for 5 minutes
+        await redis.setex(cacheKey, 300, JSON.stringify(payload));
+
+        logger.info(`Quizzes (page ${page}) served from DB and cached`);
+        res.json(payload);
     } catch (error) {
-        console.error('Get quizzes error:', error);
+        logger.error(`Get quizzes error: ${error.message}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

@@ -25,6 +25,8 @@ const DashboardLayout = () => {
 
     console.log(user.avatar)
 
+    console.log(unreadCount)
+
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
@@ -66,7 +68,9 @@ const DashboardLayout = () => {
                                 onClick={() => {
                                     setIsNotificationsOpen(!isNotificationsOpen);
                                     if (!isNotificationsOpen) {
-                                        markAllAsRead();
+                                        if (unreadCount > 0) {
+                                            markAllAsRead();
+                                        }
                                     }
                                 }}
                             >
@@ -78,29 +82,31 @@ const DashboardLayout = () => {
                                 )}
                             </Button>
                             {isNotificationsOpen && (
-                                <div className="absolute top-full left-0 w-80 z-[10000] bg-background border rounded-md shadow-lg">
+                                <div className="absolute h-[400px] overflow-hidden top-full left-0 w-80 z-[10000] bg-background border rounded-md shadow-lg">
                                     <div className="p-3 font-medium border-b">Notifications</div>
-                                    {notificationsLoading ? (
-                                        <div className="p-3 text-center text-muted-foreground">Loading...</div>
-                                    ) : notifications?.length > 0 ? (
-                                        notifications.map((notification) => (
-                                            <div key={notification._id} className="p-3 hover:bg-muted cursor-pointer flex flex-col items-start">
-                                                <div className="flex items-start gap-2 w-full">
-                                                    {!notification.hasRead && (
-                                                        <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
-                                                    )}
-                                                    <div className="flex-1">
-                                                        <p className="text-sm">{notification.content}</p>
-                                                        <p className="text-xs text-muted-foreground mt-1">
-                                                            {new Date(notification.createdAt).toLocaleDateString()}
-                                                        </p>
+                                    <div className='h-full overflow-y-auto'>
+                                        {notificationsLoading ? (
+                                            <div className="p-3 text-center text-muted-foreground">Loading...</div>
+                                        ) : notifications?.length > 0 ? (
+                                            notifications.map((notification) => (
+                                                <div key={notification._id} className="p-3 hover:bg-muted cursor-pointer flex flex-col items-start">
+                                                    <div className="flex items-start gap-2 w-full">
+                                                        {!notification.hasRead && (
+                                                            <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />
+                                                        )}
+                                                        <div className="flex-1">
+                                                            <p className="text-sm">{notification.content}</p>
+                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                                {new Date(notification.createdAt).toLocaleDateString()}
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))
-                                    ) : (
-                                        <div className="p-3 text-center text-muted-foreground">No notifications</div>
-                                    )}
+                                            ))
+                                        ) : (
+                                            <div className="p-3 text-center text-muted-foreground">No notifications</div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>

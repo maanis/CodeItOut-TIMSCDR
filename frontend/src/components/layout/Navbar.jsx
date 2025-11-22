@@ -78,11 +78,11 @@ const Navbar = () => {
                                     )}
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-80 z-50">
+                            <DropdownMenuContent align="end" className="w-80 z-50 h-60 overflow-y-auto bg-red-600">
                                 <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 {mockNotifications.map((notification) => (
-                                    <DropdownMenuItem key={notification.id} className="flex flex-col items-start p-3">
+                                    <DropdownMenuItem key={notification.id} className="flex flex-col items-start p-3 ">
                                         <div className="flex items-start gap-2 w-full">
                                             {notification.unread && (
                                                 <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0" />

@@ -19,10 +19,13 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// Fetch all contests
-const fetchContests = async () => {
-    const response = await api.get('/quizzes');
-    console.log(response.data)
+// Fetch contests with pagination
+const fetchContests = async ({ queryKey }) => {
+    // queryKey: ['contests', page, limit]
+    const [, page = 1, limit = 10] = queryKey;
+    const response = await api.get('/quizzes', {
+        params: { page, limit }
+    });
     return response.data;
 };
 
@@ -101,9 +104,10 @@ export const registerForContest = async (id) => {
 };
 
 // Hook to fetch contests
-export const useContests = () => {
+// Hook supports pagination via page & limit args
+export const useContests = (page = 1, limit = 10) => {
     return useQuery({
-        queryKey: ['contests'],
+        queryKey: ['contests', page, limit],
         queryFn: fetchContests,
         staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
         gcTime: 30 * 60 * 1000, // Cache kept for 30 minutes
