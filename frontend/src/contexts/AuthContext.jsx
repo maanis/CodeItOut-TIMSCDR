@@ -8,6 +8,7 @@ const AuthContext = createContext(undefined);
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(() => {
         const stored = localStorage.getItem('user');
+        console.log(stored)
         if (stored) {
             const parsedUser = JSON.parse(stored);
             // Ensure avatar URL is properly formatted
@@ -133,6 +134,7 @@ export function AuthProvider({ children }) {
 
             if (response.ok) {
                 const data = await response.json();
+
                 console.log('Auth check data:', data);
 
                 if (data.authenticated) {

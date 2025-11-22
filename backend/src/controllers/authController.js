@@ -257,18 +257,30 @@ const loginStudent = async (req, res) => {
             });
         }
 
-        // Find student
-        const student = await Student.findOne({ email });
+        // Check if email includes 'admin' to determine user type
+        const isAdmin = email.toLowerCase().includes('admin');
 
-        if (!student) {
+        let user, userRole;
+
+        if (isAdmin) {
+            // Search in Teacher model for admin
+            user = await Teacher.findOne({ email });
+            userRole = 'admin';
+        } else {
+            // Search in Student model for regular user
+            user = await Student.findOne({ email });
+            userRole = 'student';
+        }
+
+        if (!user) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid credentials',
             });
         }
 
-        // Check if email is verified
-        if (!student.isEmailVerified) {
+        // Check if email is verified (for students only)
+        if (!isAdmin && !user.isEmailVerified) {
             return res.status(403).json({
                 success: false,
                 message: 'Email not verified. Please verify your email first.',
@@ -276,7 +288,7 @@ const loginStudent = async (req, res) => {
         }
 
         // Verify password
-        const isPasswordValid = await bcrypt.compare(password, student.password || '');
+        const isPasswordValid = await bcrypt.compare(password, user.password || '');
 
         if (!isPasswordValid) {
             return res.status(401).json({
@@ -287,23 +299,29 @@ const loginStudent = async (req, res) => {
 
         // Generate JWT
         const token = jwt.sign(
-            { id: student._id, email: student.email, role: 'student' },
+            { id: user._id, email: user.email, role: userRole },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
 
-        logger.info(`Student logged in: ${email}`);
+        logger.info(`${isAdmin ? 'Teacher' : 'Student'} logged in: ${email}`);
 
         res.status(200).json({
             success: true,
             message: 'Login successful',
             token,
             user: {
-                id: student._id,
-                name: student.name,
-                email: student.email,
-                username: student.username,
-                isEmailVerified: student.isEmailVerified,
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: userRole,
+                ...(userRole === 'student' && {
+                    avatarUrl: user.avatarUrl,
+                    username: user.username,
+                    badges: user.badges || [],
+                    projects: user.approvedProjects || [],
+                    isEmailVerified: user.isEmailVerified,
+                }),
             },
         });
     } catch (error) {
@@ -400,14 +418,29 @@ const loginSendOTP = async (req, res) => {
             });
         }
 
-        // Check if student exists and email is verified
-        const student = await Student.findOne({ email });
+        // Check if email includes 'admin' to determine user type
+        const isAdmin = email.toLowerCase().includes('admin');
 
-        if (!student) {
-            return res.status(404).json({
-                success: false,
-                message: 'Student not found or email not verified',
-            });
+        let user;
+
+        if (isAdmin) {
+            // Search in Teacher model for admin
+            user = await Teacher.findOne({ email });
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Teacher not found',
+                });
+            }
+        } else {
+            // Search in Student model for regular user
+            user = await Student.findOne({ email });
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Student not found or email not verified',
+                });
+            }
         }
 
         // Generate OTP
@@ -419,7 +452,7 @@ const loginSendOTP = async (req, res) => {
 
         // Send OTP email
         try {
-            await sendOTPEmail(email, otp, student.name, 5);
+            await sendOTPEmail(email, otp, user.name, 5);
         } catch (emailError) {
             logger.error(`Failed to send login OTP email: ${emailError.message}`);
         }
@@ -470,14 +503,33 @@ const loginVerifyOTP = async (req, res) => {
             });
         }
 
-        // Find student
-        const student = await Student.findOne({ email, isEmailVerified: true });
+        // Check if email includes 'admin' to determine user type
+        const isAdmin = email.toLowerCase().includes('admin');
 
-        if (!student) {
+        let user, userRole;
+
+        if (isAdmin) {
+            // Search in Teacher model for admin
+            user = await Teacher.findOne({ email });
+            userRole = 'admin';
+        } else {
+            // Search in Student model for regular user
+            user = await Student.findOne({ email });
+            userRole = 'student';
+        }
+
+        if (!user) {
             return res.status(404).json({
                 success: false,
-                message: 'Student not found',
+                message: 'User not found',
             });
+        }
+
+        // Update email verification status for students
+        if (userRole === 'student') {
+            user.isEmailVerified = true;
+            user.emailVerifiedAt = new Date();
+            await user.save();
         }
 
         // Delete OTP
@@ -485,25 +537,28 @@ const loginVerifyOTP = async (req, res) => {
 
         // Generate JWT
         const token = jwt.sign(
-            { id: student._id, email: student.email, role: 'student' },
+            { id: user._id, email: user.email, role: userRole },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
 
-        logger.info(`Student logged in via OTP: ${email}`);
+        logger.info(`${isAdmin ? 'Teacher' : 'Student'} logged in via OTP: ${email}`);
 
         res.status(200).json({
             success: true,
             message: 'Login successful',
             token,
             user: {
-                id: student._id,
-                name: student.name,
-                avatarUrl: student.avatarUrl,
-                badges: student.badges || [],
-                projects: student.approvedProjects || [],
-                email: student.email,
-                isEmailVerified: student.isEmailVerified,
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: userRole,
+                ...(userRole === 'student' && {
+                    avatarUrl: user.avatarUrl,
+                    badges: user.badges || [],
+                    projects: user.approvedProjects || [],
+                    isEmailVerified: user.isEmailVerified,
+                }),
             },
         });
     } catch (error) {
@@ -670,7 +725,14 @@ const isAuthenticated = async (req, res) => {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-            const user = await Student.findById(decoded.id);
+            let user;
+
+            // Check if it's a teacher (admin) or student based on role
+            if (decoded.role === 'teacher') {
+                user = await Teacher.findById(decoded.id);
+            } else {
+                user = await Student.findById(decoded.id);
+            }
 
             if (!user) {
                 return res.json({ authenticated: false });
@@ -682,8 +744,15 @@ const isAuthenticated = async (req, res) => {
                     id: user._id,
                     name: user.name,
                     email: user.email,
-                    role: 'student',
-                    isEmailVerified: user.isEmailVerified,
+                    role: decoded.role,
+                    ...(decoded.role === 'student' && {
+                        avatarUrl: user.avatarUrl,
+                        username: user.username,
+                        badges: user.badges || [],
+                        projects: user.approvedProjects || [],
+                        isEmailVerified: user.isEmailVerified,
+                        totalPoints: user.totalPoints || 0,
+                    }),
                 }
             });
         } catch (error) {

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, Camera, Sparkles, ArrowLeft, Check, X } from 'lucide-react';
@@ -42,6 +42,27 @@ const Register = () => {
     // Safe window dimensions
     const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 1920;
     const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 1080;
+
+    // Redirect if already logged in
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        const storedToken = localStorage.getItem('token');
+
+        if (storedUser && storedToken) {
+            try {
+                const user = JSON.parse(storedUser);
+                if (user.role === 'teacher') {
+                    navigate('/admin/dashboard');
+                } else if (user.role === 'student') {
+                    navigate('/dashboard');
+                }
+            } catch (error) {
+                console.error('Error parsing stored user:', error);
+                localStorage.removeItem('user');
+                localStorage.removeItem('token');
+            }
+        }
+    }, [navigate]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -212,7 +233,14 @@ const Register = () => {
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
                 toast.success('Welcome to CodeItOut! 🎉');
-                navigate('/dashboard');
+
+                // Redirect based on role
+                const role = response.data.user.role;
+                if (role === 'teacher') {
+                    navigate('/admin/dashboard');
+                } else {
+                    navigate('/dashboard');
+                }
             }
         } catch (error) {
             if (error.response?.status === 400) {

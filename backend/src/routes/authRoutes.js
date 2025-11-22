@@ -39,7 +39,7 @@ router.post('/register', registrationRateLimiter, upload.single('profileImage'),
 // @route   POST /api/auth/login
 // @desc    Login student with email and password
 // @access  Public
-router.post('/login', loginRateLimiter, loginStudent);
+router.post('/login', loginStudent);
 
 // @route   POST /api/auth/login-username
 // @desc    Login student with username and password

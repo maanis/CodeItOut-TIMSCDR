@@ -1,11 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Sparkles, User, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -14,8 +13,8 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 const Login = () => {
     const [activeTab, setActiveTab] = useState('username'); // username, email, otp
     const [isLoading, setIsLoading] = useState(false);
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth();
 
     // Tab 1: Username & Password
     const [username, setUsername] = useState('');
@@ -53,7 +52,14 @@ const Login = () => {
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
                 toast.success('Welcome back! 🎉');
-                navigate('/dashboard');
+
+                // Redirect based on role
+                const role = response.data.user.role;
+                if (role === 'teacher') {
+                    navigate('/admin/dashboard');
+                } else {
+                    navigate('/dashboard');
+                }
             }
         } catch (error) {
             if (error.response?.status === 403) {
@@ -82,7 +88,17 @@ const Login = () => {
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
                 toast.success('Welcome back! 🎉');
-                navigate('/dashboard');
+                console.log(response.data)
+                // Redirect based on role
+                const role = response.data.user.role;
+                if (role === 'admin') {
+                    console.log('Navigating to admin dashboard');
+                    navigate('/admin/dashboard');
+                } else {
+                    console.log('Navigating to student dashboard');
+                    navigate('/dashboard');
+                }
+                console.log(role)
             }
         } catch (error) {
             if (error.response?.status === 403) {
@@ -150,7 +166,14 @@ const Login = () => {
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
                 toast.success('Login successful! 🎉');
-                navigate('/dashboard');
+
+                // Redirect based on role
+                const role = response.data.user.role;
+                if (role === 'teacher') {
+                    navigate('/admin/dashboard');
+                } else {
+                    navigate('/dashboard');
+                }
             }
         } catch (error) {
             toast.error(error.response?.data?.message || 'Invalid OTP');
@@ -215,6 +238,29 @@ const Login = () => {
         }
     };
 
+    // useEffect(() => {
+    //     if (isRedirecting) return;
+
+    //     const storedUser = localStorage.getItem('user');
+    //     const storedToken = localStorage.getItem('token');
+
+    //     if (storedUser && storedToken) {
+    //         try {
+    //             const user = JSON.parse(storedUser);
+    //             setIsRedirecting(true);
+    //             if (user.role === 'teacher') {
+    //                 navigate('/admin/dashboard');
+    //             } else if (user.role === 'student') {
+    //                 navigate('/dashboard');
+    //             }
+    //         } catch (error) {
+    //             console.error('Error parsing stored user:', error);
+    //             localStorage.removeItem('user');
+    //             localStorage.removeItem('token');
+    //         }
+    //     }
+    // }, [handleUsernameLogin]);
+
     return (
         <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
             {/* Animated background */}
@@ -269,8 +315,8 @@ const Login = () => {
                         <button
                             onClick={() => setActiveTab('username')}
                             className={`flex-1 py-2 px-3 rounded font-medium text-sm transition-all ${activeTab === 'username'
-                                    ? 'bg-primary text-white'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                ? 'bg-primary text-white'
+                                : 'text-muted-foreground hover:text-foreground'
                                 }`}
                         >
                             <div className="flex items-center justify-center gap-2">
@@ -281,8 +327,8 @@ const Login = () => {
                         <button
                             onClick={() => setActiveTab('email')}
                             className={`flex-1 py-2 px-3 rounded font-medium text-sm transition-all ${activeTab === 'email'
-                                    ? 'bg-primary text-white'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                ? 'bg-primary text-white'
+                                : 'text-muted-foreground hover:text-foreground'
                                 }`}
                         >
                             <div className="flex items-center justify-center gap-2">
@@ -293,8 +339,8 @@ const Login = () => {
                         <button
                             onClick={() => setActiveTab('otp')}
                             className={`flex-1 py-2 px-3 rounded font-medium text-sm transition-all ${activeTab === 'otp'
-                                    ? 'bg-primary text-white'
-                                    : 'text-muted-foreground hover:text-foreground'
+                                ? 'bg-primary text-white'
+                                : 'text-muted-foreground hover:text-foreground'
                                 }`}
                         >
                             <div className="flex items-center justify-center gap-2">

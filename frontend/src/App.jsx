@@ -33,6 +33,7 @@ import ManageContests from "./pages/admin/ManageContests";
 import AdminContestResults from "./pages/admin/AdminContestResults";
 import Logs from "./pages/admin/Logs";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
@@ -45,7 +46,10 @@ const ProtectedRoute = ({ children, allowedRole }) => {
     return <>{children}</>;
 };
 
+
+
 const App = () => (
+
     <QueryClientProvider client={queryClient}>
         <ThemeProvider>
             <AuthProvider>
@@ -65,9 +69,9 @@ const App = () => (
                                 <Route
                                     path="/dashboard"
                                     element={
-                                        <ProtectedRoute allowedRole="student">
-                                            <DashboardLayout />
-                                        </ProtectedRoute>
+                                        // <ProtectedRoute allowedRole="student">
+                                        <DashboardLayout />
+                                        // </ProtectedRoute>
                                     }
                                 >
                                     <Route index element={<Dashboard />} />
@@ -87,9 +91,9 @@ const App = () => (
                                 <Route
                                     path="/admin"
                                     element={
-                                        <ProtectedRoute allowedRole="admin">
-                                            <AdminDashboardLayout />
-                                        </ProtectedRoute>
+                                        // <ProtectedRoute allowedRole="admin">
+                                        <AdminDashboardLayout />
+                                        // </ProtectedRoute>
                                     }
                                 >
                                     <Route path="dashboard" element={<AdminDashboard />} />
