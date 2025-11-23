@@ -152,7 +152,7 @@ export function AuthProvider({ children }) {
                         id: userData.id,
                         name: userData.name,
                         email: userData.email,
-                        role: user?.role || (userType === 'teacher' ? (userData.email.toLowerCase().includes('admin') ? 'admin' : 'teacher') : 'student'),
+                        role: userData?.role || (userType === 'admin' ? (userData.email.toLowerCase().includes('admin') ? 'admin' : 'student') : 'student'),
                         avatar: userData.avatarUrl ? (userData.avatarUrl.startsWith('/uploads/') ? `${API_BASE_URL}${userData.avatarUrl}` : userData.avatarUrl) : user?.avatar,
                         ...(userType === 'student' && { badges: userData.badges || [] })
                     };

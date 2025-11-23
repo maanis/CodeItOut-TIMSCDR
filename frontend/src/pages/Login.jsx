@@ -5,6 +5,7 @@ import { Mail, Lock, Sparkles, User, Key } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import axios from 'axios';
 
@@ -15,6 +16,7 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isRedirecting, setIsRedirecting] = useState(false);
     const navigate = useNavigate();
+    const { login, refreshUser } = useAuth();
 
     // Tab 1: Username & Password
     const [username, setUsername] = useState('');
@@ -53,7 +55,9 @@ const Login = () => {
 
                 toast.success('Welcome back! 🎉');
 
-                // Redirect based on role
+                // Refresh user context and redirect
+                await refreshUser();
+
                 const role = response.data.user.role;
                 if (role === 'teacher') {
                     navigate('/admin/dashboard');
@@ -88,17 +92,17 @@ const Login = () => {
                 localStorage.setItem('user', JSON.stringify(response.data.user));
 
                 toast.success('Welcome back! 🎉');
-                console.log(response.data)
-                // Redirect based on role
+
+                // Refresh user context and redirect
+                await refreshUser();
+
                 const role = response.data.user.role;
+                console.log(role)
                 if (role === 'admin') {
-                    console.log('Navigating to admin dashboard');
                     navigate('/admin/dashboard');
                 } else {
-                    console.log('Navigating to student dashboard');
                     navigate('/dashboard');
                 }
-                console.log(role)
             }
         } catch (error) {
             if (error.response?.status === 403) {
@@ -167,7 +171,9 @@ const Login = () => {
 
                 toast.success('Login successful! 🎉');
 
-                // Redirect based on role
+                // Refresh user context and redirect
+                await refreshUser();
+
                 const role = response.data.user.role;
                 if (role === 'teacher') {
                     navigate('/admin/dashboard');

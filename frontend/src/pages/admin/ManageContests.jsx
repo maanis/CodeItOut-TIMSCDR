@@ -551,7 +551,7 @@ Number of questions: ${numQuestions}`;
                         </CardContent>
                     </Card>
                 ) : (
-                    contests.map((contest) => (
+                    contests?.map((contest) => (
                         <Card key={contest._id}>
                             <CardHeader>
                                 <div className="flex justify-between items-start">

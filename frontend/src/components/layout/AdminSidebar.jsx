@@ -1,6 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
     LayoutDashboard,
     Megaphone,
@@ -16,7 +16,8 @@ import {
     LogOut,
     Menu,
     X,
-    FileText
+    FileText,
+    ChevronUp
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -39,14 +40,30 @@ const navItems = [
 ];
 
 const AdminSidebar = () => {
-    const { logout } = useAuth();
+    const { logout, user } = useAuth();
+    const navigate = useNavigate();
     const { isMobileMenuOpen, closeMobileMenu } = useMobileMenu();
     const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
 
     const handleLogout = () => {
         logout();
         setIsLogoutDialogOpen(false);
+        setIsUserMenuOpen(false);
+        navigate('/');
     };
+
+    // Click-outside detection for user menu
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+                setIsUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
     return (
         <>
             {/* Mobile Menu Overlay */}
@@ -59,28 +76,31 @@ const AdminSidebar = () => {
 
             {/* Sidebar */}
             <aside className={cn(
-                "flex flex-col w-64 border-r border-border bg-card/50 backdrop-blur-sm",
+                "flex flex-col h-screen w-64 border-r border-border bg-card/50 backdrop-blur-sm",
                 // Desktop: always visible, normal layout
                 "lg:flex lg:relative lg:translate-x-0",
                 // Mobile: overlay from left with animation
-                "fixed left-0 top-0 h-full z-50 transition-transform duration-300 ease-in-out",
+                "fixed left-0 top-0 z-50 transition-transform duration-300 ease-in-out",
                 isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
             )}>
-                <div className="p-6 border-b border-border">
-                    <div className="flex items-center gap-3">
-                        <img src="/logo.png" className='h-12 w-12' alt="" />
-
-                        <div>
-                            <h2 className="font-bold text-lg">Admin Panel</h2>
-                            <p className="text-xs text-muted-foreground">Management</p>
+                {/* Header */}
+                <div className="p-4 border-b border-border">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3 flex-1">
+                            <img src="/logo.png" className='h-10 w-10 rounded-lg' alt="Logo" />
+                            <div className="min-w-0">
+                                <h2 className="font-bold text-sm truncate">CodeItOut</h2>
+                                <p className="text-xs text-muted-foreground truncate">Admin</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <nav className="flex-1 p-4">
-                    <ul className="space-y-2">
+                {/* Navigation - Scrollable */}
+                <nav className="flex-1 overflow-y-auto p-3 scrollbar-hide">
+                    <div className="space-y-1">
                         {navItems.map((item, index) => (
-                            <motion.li
+                            <motion.div
                                 key={item.path}
                                 initial={{ x: -20, opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
@@ -91,39 +111,85 @@ const AdminSidebar = () => {
                                     end={item.path === '/admin/dashboard'}
                                     className={({ isActive }) =>
                                         cn(
-                                            'flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200',
+                                            'flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm font-medium',
                                             isActive
                                                 ? 'bg-primary text-primary-foreground shadow-md'
-                                                : 'hover:bg-secondary text-foreground'
+                                                : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
                                         )
                                     }
-                                    onClick={closeMobileMenu} // Close mobile menu on navigation
+                                    onClick={closeMobileMenu}
                                 >
                                     {({ isActive }) => (
                                         <>
-                                            <item.icon className={cn('w-5 h-5', isActive && 'animate-pulse')} />
-                                            <span className="font-medium">{item.label}</span>
+                                            <item.icon className={cn('w-4 h-4 shrink-0', isActive && 'animate-pulse')} />
+                                            <span className="truncate">{item.label}</span>
                                         </>
                                     )}
                                 </NavLink>
-                            </motion.li>
+                            </motion.div>
                         ))}
-                    </ul>
+                    </div>
                 </nav>
 
-                {/* Logout Button */}
-                <div className="p-4 border-t border-border">
-                    <Button
-                        onClick={() => {
-                            setIsLogoutDialogOpen(true);
-                            closeMobileMenu(); // Close mobile menu
-                        }}
-                        variant="ghost"
-                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-destructive hover:text-destructive-foreground text-muted-foreground hover:text-white"
+                {/* Footer - User Menu */}
+                <div className="p-3 border-t border-border" ref={userMenuRef}>
+                    <button
+                        onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                        className="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-lg text-sm font-medium text-foreground hover:bg-secondary transition-colors"
                     >
-                        <LogOut className="w-5 h-5" />
-                        <span className="font-medium">Logout</span>
-                    </Button>
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 overflow-hidden">
+                                {user?.avatar ? (
+                                    <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <span className="text-xs font-bold text-primary-foreground">
+                                        {user?.name?.charAt(0).toUpperCase() || 'A'}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-xs font-semibold truncate">{user?.name || 'Admin'}</p>
+                                <p className="text-xs text-muted-foreground truncate">{user?.email || 'admin@email.com'}</p>
+                            </div>
+                        </div>
+                        <ChevronUp className={cn('w-4 h-4 shrink-0 ml-2 transition-transform', isUserMenuOpen && 'rotate-180')} />
+                    </button>
+
+                    {/* User Menu Dropdown */}
+                    <motion.div
+                        initial={{ opacity: 0, y: -10, height: 0 }}
+                        animate={isUserMenuOpen ? { opacity: 1, y: 0, height: 'auto' } : { opacity: 0, y: -10, height: 0 }}
+                        transition={{ duration: 0.2, ease: 'easeInOut' }}
+                        className={cn('mt-2 p-1 bg-secondary rounded-lg space-y-1 overflow-hidden', !isUserMenuOpen && 'pointer-events-none')}
+                    >
+                        {/* User Info Header */}
+                        <div className="px-3 py-2 border-b border-border mb-1">
+                            <p className="font-semibold text-sm">{user?.name || 'Admin'}</p>
+                            <p className="text-xs text-muted-foreground truncate">{user?.email || 'admin@email.com'}</p>
+                        </div>
+
+                        {/* Settings Link */}
+                        <NavLink
+                            to="/admin/settings"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-2 px-3 py-2 rounded text-sm hover:bg-accent transition-colors cursor-pointer"
+                        >
+                            <Settings className="w-4 h-4" />
+                            Settings
+                        </NavLink>
+
+                        {/* Sign Out Button */}
+                        <button
+                            onClick={() => {
+                                setIsLogoutDialogOpen(true);
+                                setIsUserMenuOpen(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 rounded text-sm text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
+                        >
+                            <LogOut className="w-4 h-4" />
+                            Sign Out
+                        </button>
+                    </motion.div>
                 </div>
 
                 {/* Logout Confirmation Dialog */}

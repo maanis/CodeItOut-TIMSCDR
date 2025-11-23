@@ -726,9 +726,10 @@ const isAuthenticated = async (req, res) => {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
             let user;
+            console.log(decoded)
 
             // Check if it's a teacher (admin) or student based on role
-            if (decoded.role === 'teacher') {
+            if (decoded.role === 'teacher' || decoded.role === 'admin') {
                 user = await Teacher.findById(decoded.id);
             } else {
                 user = await Student.findById(decoded.id);

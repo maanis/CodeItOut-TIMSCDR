@@ -1055,3 +1055,86 @@
 {"level":30,"time":1763830304789,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
 {"level":30,"time":1763830304881,"pid":20324,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
 {"level":30,"time":1763830312747,"pid":20324,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763831214155,"pid":20324,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763831276911,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763831295890,"pid":20324,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763831310410,"pid":20324,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763831317904,"pid":20324,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from DB and cached"}
+{"level":30,"time":1763831333159,"pid":20324,"hostname":"Manishj-PC","msg":"✓ OTP email sent to manishjha962@gmail.com"}
+{"level":30,"time":1763831333159,"pid":20324,"hostname":"Manishj-PC","msg":"📧 Preview URL: https://ethereal.email/message/aSG-JzKY-EBa7UOtaSHuJKPtGIlB5TteAAAAB81Y.A7aImLNdi-1RJo9Q9I"}
+{"level":30,"time":1763831333160,"pid":20324,"hostname":"Manishj-PC","msg":"Login OTP sent to manishjha962@gmail.com"}
+{"level":30,"time":1763831348528,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in via OTP: manishjha962@gmail.com"}
+{"level":30,"time":1763831381725,"pid":20324,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763831389557,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763831595598,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763831607578,"pid":20324,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763831618652,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763831618751,"pid":20324,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763831625716,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763831632008,"pid":20324,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763831659972,"pid":20324,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763831673887,"pid":20324,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763831744423,"pid":21708,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763831748032,"pid":21708,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763831750479,"pid":21708,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763831750623,"pid":21708,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763831798921,"pid":2196,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763831801129,"pid":21408,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763831805178,"pid":17396,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763831808668,"pid":17396,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763831817183,"pid":17396,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763831898036,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763831906039,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763879534428,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763879668722,"pid":17396,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763879668846,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763879679953,"pid":17396,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763879695174,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763879729075,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from DB and cached"}
+{"level":30,"time":1763879785717,"pid":17396,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763879898320,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763879905082,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763879912986,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763879919720,"pid":17396,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763880095858,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763880229413,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763880234168,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763880239142,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763880487503,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from DB and cached"}
+{"level":30,"time":1763880560615,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763880667051,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763880723299,"pid":17396,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763880723679,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763880793651,"pid":17396,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763880794038,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763880890553,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763880907557,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763880919554,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763880954056,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881117490,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from DB and cached"}
+{"level":30,"time":1763881120380,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881120381,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from cache"}
+{"level":30,"time":1763881123695,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881138431,"pid":17396,"hostname":"Manishj-PC","total":1117,"page":1,"limit":50,"returned":50,"msg":"Returning formatted logs"}
+{"level":30,"time":1763881156646,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from cache"}
+{"level":30,"time":1763881196031,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881196040,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from cache"}
+{"level":30,"time":1763881206041,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881289000,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881308925,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881315645,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881367487,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881376157,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881588610,"pid":17396,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763881599341,"pid":17396,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763881628854,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763881658499,"pid":17396,"hostname":"Manishj-PC","msg":"✓ OTP email sent to manishjha962@gmail.com"}
+{"level":30,"time":1763881658500,"pid":17396,"hostname":"Manishj-PC","msg":"📧 Preview URL: https://ethereal.email/message/aSG-JzKY-EBa7UOtaSKyuruZWqzzqM5gAAAACKDO3wFGIXZmI0G1-w4JXRc"}
+{"level":30,"time":1763881658500,"pid":17396,"hostname":"Manishj-PC","msg":"Login OTP sent to manishjha962@gmail.com"}
+{"level":30,"time":1763881672439,"pid":17396,"hostname":"Manishj-PC","msg":"Student logged in via OTP: manishjha962@gmail.com"}
+{"level":30,"time":1763881825686,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from DB and cached"}
+{"level":30,"time":1763881858891,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763881877128,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763881904318,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from cache"}
+{"level":30,"time":1763881943533,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763881960827,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
