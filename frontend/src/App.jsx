@@ -7,6 +7,8 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { MobileMenuProvider } from "@/contexts/MobileMenuContext";
 import Login from "./pages/Login";
+import TestLogin from "./pages/TestLogin";
+import TestRegister from "./pages/TestRegister";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -61,6 +63,8 @@ const App = () => (
                         <BrowserRouter>
                             <Routes>
                                 <Route path="/" element={<Index />} />
+                                <Route path="/testLogin" element={<TestLogin />} />
+                                <Route path="/testRegister" element={<TestRegister />} />
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/register" element={<Register />} />
                                 <Route path="/contests/:id/waiting" element={<ContestWaitingRoom />} />

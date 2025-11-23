@@ -16,7 +16,7 @@ const SmoothScroll = ({ children }) => {
             smoothMobile: false,
             resetNativeScroll: true,
             multiplier: 1,
-            lerp: 0.10,
+            lerp: 0.1,
             smartphone: { smooth: false },
             tablet: { smooth: false },
         });
