@@ -101,7 +101,7 @@ const initializeLeaderboard = async () => {
             const Badge = require('./models/Badge');
             const Project = require('./models/Project');
 
-            const students = await Student.find().select('_id name email totalPoints avatar');
+            const students = await Student.find().select('_id name email totalPoints avatarUrl');
 
             if (students.length > 0) {
                 for (const student of students) {
@@ -112,7 +112,7 @@ const initializeLeaderboard = async () => {
                         ]);
 
                         await redis.zadd('leaderboard:students', student.totalPoints || 0, student._id.toString());
-                        await redis.hset(`leaderboard:student:${student._id.toString()}`, 'name', student.name, 'email', student.email, 'badgesCount', badgesCount, 'projectsCount', projectsCount, 'avatar', student.avatar || '');
+                        await redis.hset(`leaderboard:student:${student._id.toString()}`, 'name', student.name, 'email', student.email, 'badgesCount', badgesCount, 'projectsCount', projectsCount, 'avatar', student.avatarUrl || '');
                     } catch (err) {
                         logger.error(`Error initializing student ${student._id}:`, err);
                     }

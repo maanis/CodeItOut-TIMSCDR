@@ -175,4 +175,13 @@ All colors MUST be HSL.
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .gradient-bg {
+    background: linear-gradient(135deg, hsl(240 20% 98%), hsl(240 20% 92%));
+    position: relative;
+  }
+
+  .dark .gradient-bg {
+    background: linear-gradient(135deg, hsl(240 10% 8%), hsl(240 10% 12%));
+  }
 }

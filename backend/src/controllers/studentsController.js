@@ -4,6 +4,7 @@ const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
+const redis = require('../config/redis');
 
 // Python face recognition API URL (adjust port as needed)
 const FACE_API_URL = process.env.FACE_API_URL || 'http://localhost:8000';
@@ -482,6 +483,94 @@ const removeFromCommunity = async (req, res) => {
     }
 };
 
+/**
+ * Get current student's profile with rank and badges
+ * Rank is fetched from Redis leaderboard, falls back to computed rank if needed
+ * @route GET /api/students/profile/my-profile
+ * @access Private (requires authentication)
+ */
+const getMyProfile = async (req, res) => {
+    try {
+        const studentId = req.user.id;
+
+        // Fetch student with badges
+        const student = await Student.findById(studentId)
+            .populate({
+                path: 'badges',
+                select: 'name icon points description'
+            })
+            .select('name email totalPoints avatarUrl badges');
+
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
+        }
+
+        let rank = null;
+
+        // Try to get rank from Redis leaderboard
+        try {
+            const LEADERBOARD_KEY = 'leaderboard:students';
+
+            // Get rank using ZREVRANK (0-indexed, highest score is rank 0)
+            const redisRank = await redis.zrevrank(LEADERBOARD_KEY, studentId);
+
+            if (redisRank !== null && redisRank !== undefined) {
+                rank = redisRank + 1; // Convert to 1-indexed
+            }
+        } catch (redisError) {
+            console.error('Error fetching rank from Redis:', redisError);
+            // Continue to compute rank if Redis fails
+        }
+
+        // If rank not found in Redis, compute it optimally
+        if (rank === null) {
+            try {
+                // Count students with more points than current student
+                const studentsWithMorePoints = await Student.countDocuments({
+                    totalPoints: { $gt: student.totalPoints }
+                });
+                rank = studentsWithMorePoints + 1;
+            } catch (dbError) {
+                console.error('Error computing rank from database:', dbError);
+                rank = 0; // Fallback if both methods fail
+            }
+        }
+
+        const profileData = {
+            id: student._id,
+            name: student.name,
+            email: student.email,
+            totalPoints: student.totalPoints || 0,
+            rank: rank,
+            badgesCount: student.badges.length,
+            badges: student.badges.map(badge => ({
+                id: badge._id,
+                name: badge.name,
+                icon: badge.icon,
+                points: badge.points,
+                description: badge.description
+            })),
+            avatar: student.avatarUrl || null
+        };
+
+        res.status(200).json({
+            success: true,
+            data: profileData
+        });
+
+    } catch (error) {
+        console.error('Get my profile error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch profile',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createStudent,
     getAllStudents,
@@ -491,5 +580,6 @@ module.exports = {
     deleteStudent,
     updateFaceEmbeddings,
     addToCommunity,
-    removeFromCommunity
+    removeFromCommunity,
+    getMyProfile
 };

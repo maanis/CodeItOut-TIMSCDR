@@ -24,13 +24,34 @@ const fetchStudents = async () => {
     return response.data.students;
 };
 
+// Fetch current student's profile with rank and badges
+const fetchMyProfile = async () => {
+    const response = await api.get('/students/profile/my-profile');
+    return response.data;
+};
+
 // Custom hook for all students
 export const useStudents = () => {
     return useQuery({
         queryKey: ['students'],
         queryFn: fetchStudents,
-        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        staleTime: 1 * 60 * 1000, // Data is fresh for 1 minute
         gcTime: 30 * 60 * 1000, // Cache kept for 30 minutes
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: true,
+    });
+};
+
+/**
+ * Hook to fetch current student's profile
+ * Returns: totalPoints, rank, badges, and other profile data
+ */
+export const useMyProfile = () => {
+    return useQuery({
+        queryKey: ['myProfile'],
+        queryFn: fetchMyProfile,
+        staleTime: 5 * 60 * 1000, // Data is fresh for 5 minutes
+        gcTime: 10 * 60 * 1000, // Cache kept for 10 minutes
         refetchOnWindowFocus: false,
         refetchOnReconnect: true,
     });

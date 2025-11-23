@@ -7,10 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import { useState, useRef, useEffect } from 'react';
-import { useStudents } from '@/hooks/useStudents';
-import { useEvents } from '@/hooks/useEvents';
-import { useProjects } from '@/hooks/useProjects';
-import { useBadges } from '@/hooks/useBadges';
+import { useAdminDashboardStats } from '@/hooks/useDashboard';
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
@@ -19,11 +16,9 @@ const AdminDashboard = () => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const userMenuRef = useRef();
 
-    // Fetch data from database
-    const { data: students = [], isLoading: studentsLoading } = useStudents();
-    const { data: events = [], isLoading: eventsLoading } = useEvents();
-    const { data: projects = [], isLoading: projectsLoading } = useProjects();
-    const { data: badges = [], isLoading: badgesLoading } = useBadges();
+    // Fetch optimized admin stats from single endpoint
+    const { data: statsResponse, isLoading: statsLoading } = useAdminDashboardStats();
+    const statsData = statsResponse?.data || {};
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -40,29 +35,29 @@ const AdminDashboard = () => {
         navigate('/');
     };
 
-    // Calculate dynamic stats
+    // Calculate stats from single API response
     const stats = [
         {
             label: 'Total Students',
-            value: studentsLoading ? '...' : students.length,
+            value: statsLoading ? '...' : statsData.totalStudents || 0,
             icon: Users,
             gradient: 'bg-gradient-to-br from-blue-500 to-cyan-500'
         },
         {
             label: 'Active Events',
-            value: eventsLoading ? '...' : events.filter(event => event.status === 'Ongoing' || event.status === 'Upcoming').length,
+            value: statsLoading ? '...' : statsData.totalEvents || 0,
             icon: Calendar,
             gradient: 'bg-gradient-to-br from-purple-500 to-pink-500'
         },
         {
             label: 'Projects Pending',
-            value: projectsLoading ? '...' : projects.filter(project => !project.approved).length,
+            value: statsLoading ? '...' : statsData.totalPendingProjects || 0,
             icon: FolderKanban,
             gradient: 'bg-gradient-to-br from-orange-500 to-red-500'
         },
         {
             label: 'Total Badges',
-            value: badgesLoading ? '...' : badges.length,
+            value: statsLoading ? '...' : statsData.totalBadges || 0,
             icon: Trophy,
             gradient: 'bg-gradient-to-br from-green-500 to-emerald-500'
         },

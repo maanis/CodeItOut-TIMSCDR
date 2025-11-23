@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Confetti from 'react-confetti';
 import { useWindowSize } from '@/hooks/useWindowSize';
@@ -7,40 +7,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import StatCard from '@/components/dashboard/StatCard';
-import { useAuth } from '@/contexts/AuthContext';
-import { useStudents } from '@/hooks/useStudents';
+import { useMyProfile } from '@/hooks/useStudents';
 
 const StudentDashboard = () => {
     const [showConfetti, setShowConfetti] = useState(false);
     const { width, height } = useWindowSize();
-    const { user } = useAuth();
-    const { data: students = [] } = useStudents();
 
-    // Get badges from user state
-    const userBadges = user?.badges || [];
+    // Fetch current student's profile with rank and badges
+    const { data: profileResponse, isLoading: profileLoading } = useMyProfile();
+    const profileData = profileResponse?.data || {};
 
-    // Calculate user's rank based on points
-    const userRank = useMemo(() => {
-        if (!students.length || !user) return null;
-
-        const userPoints = user.badges?.reduce((sum, badge) => sum + (badge?.points || 0), 0) || 0;
-
-        // Create sorted list of all students by points
-        const sortedStudents = students
-            .map(student => ({
-                id: student.id,
-                points: student.badges?.reduce((sum, badge) => sum + (badge?.points || 0), 0) || 0
-            }))
-            .sort((a, b) => b.points - a.points);
-
-        // Find user's rank
-        const rankIndex = sortedStudents.findIndex(student => student.id === user.id);
-        return rankIndex !== -1 ? rankIndex + 1 : null;
-    }, [students, user]);
+    // Extract profile data
+    const userBadges = profileData.badges || [];
+    const userRank = profileData.rank || '--';
+    const totalPoints = profileData.totalPoints || 0;
 
     // Get rank suffix (1st, 2nd, 3rd, 4th, etc.)
     const getRankSuffix = (rank) => {
-        if (!rank) return 'th';
+        if (!rank || rank === '--') return '';
         const lastDigit = rank % 10;
         const lastTwoDigits = rank % 100;
 
@@ -86,8 +70,8 @@ const StudentDashboard = () => {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <StatCard icon={Code2} label="Total Points" value={user?.badges?.reduce((sum, badge) => sum + (badge?.points || 0), 0) || 0} index={0} gradient="gradient-primary" />
-                <StatCard icon={Trophy} label="Rank" value={userRank || '--'} suffix={userRank ? getRankSuffix(userRank) : ''} index={1} gradient="gradient-accent" />
+                <StatCard icon={Code2} label="Total Points" value={profileLoading ? '...' : totalPoints} index={0} gradient="gradient-primary" />
+                <StatCard icon={Trophy} label="Rank" value={profileLoading ? '...' : userRank} suffix={userRank !== '--' ? getRankSuffix(userRank) : ''} index={1} gradient="gradient-accent" />
                 <StatCard icon={Target} label="Goals Completed" value={8} suffix="/12" index={2} gradient="gradient-success" />
                 <StatCard icon={Calendar} label="Days Active" value={45} index={3} gradient="gradient-primary" />
             </div>

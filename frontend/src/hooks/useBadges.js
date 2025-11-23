@@ -171,6 +171,9 @@ export const useAssignBadge = () => {
         mutationFn: ({ badgeId, studentId }) => assignBadgeToStudent(badgeId, studentId),
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['student-badges'] });
+            // Invalidate all leaderboard pages (not just one specific page)
+            queryClient.invalidateQueries({ queryKey: ['leaderboard'], exact: false });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
             queryClient.invalidateQueries({ queryKey: ['students'] });
 
             // If the badge was assigned to the current user, refresh their data
@@ -189,6 +192,9 @@ export const useRemoveBadge = () => {
         mutationFn: ({ badgeId, studentId }) => removeBadgeFromStudent(badgeId, studentId),
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries({ queryKey: ['student-badges'] });
+            // Invalidate all leaderboard pages (not just one specific page)
+            queryClient.invalidateQueries({ queryKey: ['leaderboard'], exact: false });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
             queryClient.invalidateQueries({ queryKey: ['students'] });
 
             // If the badge was removed from the current user, refresh their data

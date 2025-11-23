@@ -26,6 +26,7 @@ const ManageBadges = () => {
         description: ''
     });
 
+
     // Predefined badge icons
     const badgeIcons = [
         { icon: '🎨', name: 'Creative Genius' },
@@ -116,6 +117,7 @@ const ManageBadges = () => {
                 badgeId: selectedBadge._id,
                 studentId
             });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
             setIsAssignDialogOpen(false);
             setSelectedBadge(null);
         } catch (error) {

@@ -61,24 +61,29 @@ const getLeaderboard = async (req, res) => {
             'WITHSCORES'
         );
 
+        // Use Redis pipeline to fetch all student data efficiently
+        const pipeline = redis.pipeline();
+        for (let i = 0; i < leaderboardData.length; i += 2) {
+            const studentId = leaderboardData[i];
+            pipeline.hgetall(`leaderboard:student:${studentId}`);
+        }
+        const pipelineResults = await pipeline.exec();
+
         // Parse the data and construct response with rank
         const leaderboard = [];
         for (let i = 0; i < leaderboardData.length; i += 2) {
             const studentId = leaderboardData[i];
-            const score = leaderboardData[i + 1];
-
-            // Get full student data from Redis hash
-            const studentData = await redis.hgetall(`leaderboard:student:${studentId}`);
-
-            console.log(studentData, 'sdgsdgshgdhsgdhsgdhsgdshg')
+            const score = parseInt(leaderboardData[i + 1]);
+            const resultIndex = Math.floor(i / 2);
+            const studentData = pipelineResults[resultIndex][1];
 
             if (studentData && Object.keys(studentData).length > 0) {
                 leaderboard.push({
-                    rank: skip + Math.floor(i / 2) + 1,
+                    rank: skip + resultIndex + 1,
                     studentId: studentId,
                     name: studentData.name || 'Unknown',
                     email: studentData.email || '',
-                    points: parseInt(score),
+                    points: score,
                     badgesCount: parseInt(studentData.badgesCount) || 0,
                     projectsCount: parseInt(studentData.projectsCount) || 0,
                     avatar: studentData.avatar || null
@@ -125,7 +130,7 @@ const updateLeaderboard = async (req, res) => {
         const { studentId } = req.params;
 
         // Fetch student from database
-        const student = await Student.findById(studentId).select('name email totalPoints avatar');
+        const student = await Student.findById(studentId).select('name email totalPoints avatarUrl');
         if (!student) {
             return res.status(404).json({
                 success: false,
@@ -143,7 +148,7 @@ const updateLeaderboard = async (req, res) => {
         await redis.zadd(LEADERBOARD_KEY, student.totalPoints || 0, studentId);
 
         // Store student data in Redis hash for quick access
-        await redis.hset(`leaderboard:student:${studentId}`, 'name', student.name, 'email', student.email, 'badgesCount', badgesCount, 'projectsCount', projectsCount, 'avatar', student.avatarUrl || '');
+        await redis.hset(`leaderboard:student:${studentId}`, 'name', student.name, 'email', student.email, 'badgesCount', badgesCount, 'projectsCount', projectsCount, 'avatar', `http://localhost:5000/api${student.avatarUrl}` || '');
 
         // Clear all page caches since leaderboard has changed
         const keys = await redis.keys('leaderboard:page:*');
@@ -201,37 +206,53 @@ const rebuildLeaderboard = async (req, res) => {
 
         let addedCount = 0;
 
-        console.log(students)
-
-        // Process each student
-        for (const student of students) {
-            try {
-                // Count badges and projects
-                console.log(student.avatarUrl)
-                const [badgesCount, projectsCount] = await Promise.all([
+        // Prepare all badge and project counts in parallel
+        const studentMetadata = await Promise.all(
+            students.map(student =>
+                Promise.all([
                     Badge.countDocuments({ earnedBy: student._id }),
                     Project.countDocuments({ studentId: student._id })
-                ]);
+                ]).then(([badgesCount, projectsCount]) => ({
+                    studentId: student._id.toString(),
+                    badgesCount,
+                    projectsCount
+                }))
+            )
+        );
 
-                // Add to sorted set
-                await redis.zadd(LEADERBOARD_KEY, student.totalPoints || 0, student._id.toString());
+        // Use Redis pipeline to add all students efficiently
+        const pipeline = redis.pipeline();
 
-                // Store student data in hash
-                await redis.hset(`leaderboard:student:${student._id.toString()}`, 'name', student.name, 'email', student.email, 'badgesCount', badgesCount, 'projectsCount', projectsCount, 'avatar', `http://localhost:5000/api${student.avatarUrl}` || '');
+        for (let i = 0; i < students.length; i++) {
+            const student = students[i];
+            const metadata = studentMetadata[i];
 
-                addedCount++;
-            } catch (studentError) {
-                console.error(`Error processing student ${student._id}:`, studentError);
-            }
+            // Add to sorted set
+            pipeline.zadd(LEADERBOARD_KEY, student.totalPoints || 0, metadata.studentId);
+
+            // Store student data in hash (store only relative path for avatar)
+            pipeline.hset(
+                `leaderboard:student:${metadata.studentId}`,
+                'name', student.name,
+                'email', student.email,
+                'badgesCount', metadata.badgesCount,
+                'projectsCount', metadata.projectsCount,
+                'avatar', `http://localhost:5000/api${student.avatarUrl}` || ''
+            );
         }
+
+        const pipelineResults = await pipeline.exec();
+
+        // Count successful operations
+        addedCount = pipelineResults.filter(result => result[0] === null).length / 2;
 
         res.json({
             success: true,
             message: 'Leaderboard rebuilt successfully',
             data: {
                 totalStudents: students.length,
-                addedCount: addedCount,
-                failedCount: students.length - addedCount
+                addedCount: Math.floor(addedCount),
+                failedCount: students.length - Math.floor(addedCount)
             }
         });
     } catch (error) {

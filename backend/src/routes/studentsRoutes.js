@@ -8,9 +8,11 @@ const {
     deleteStudent,
     updateFaceEmbeddings,
     addToCommunity,
-    removeFromCommunity
+    removeFromCommunity,
+    getMyProfile
 } = require('../controllers/studentsController');
 const { uploadSingle } = require('../config/multer');
+const auth = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -43,6 +45,11 @@ router.put('/:id', uploadSingle, updateStudent);
 // @desc    Delete student
 // @access  Private (should require authentication)
 router.delete('/:id', deleteStudent);
+
+// @route   GET /api/students/profile/my-profile
+// @desc    Get current student's profile with rank and badges
+// @access  Private (requires authentication)
+router.get('/profile/my-profile', auth, getMyProfile);
 
 // @route   PUT /api/students/:id/face-embeddings
 // @desc    Update face embeddings for a student

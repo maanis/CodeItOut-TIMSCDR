@@ -19,21 +19,11 @@ export const useLeaderboard = (page = 1, limit = 10) => {
             });
             return response.data;
         },
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        staleTime: 0, // 5 minutes
         gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
-        keepPreviousData: true
+        keepPreviousData: true,
+        refetchOnWindowFocus: false
+
     });
 };
 
-/**
- * Hook to rebuild leaderboard (admin only)
- * @returns {object} Mutation object with mutate, isPending, isSuccess, error
- */
-export const useRebuildLeaderboard = () => {
-    return useMutation({
-        mutationFn: async () => {
-            const response = await axios.post(`${API_BASE_URL}/leaderboard/rebuild`);
-            return response.data;
-        }
-    });
-};

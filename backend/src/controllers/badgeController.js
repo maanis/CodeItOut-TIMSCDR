@@ -1,6 +1,7 @@
 const Badge = require('../models/Badge');
 const Student = require('../models/Student');
 const Notification = require('../models/Notification');
+const redis = require('../config/redis');
 
 // @desc    Create a new badge
 // @route   POST /api/badges
@@ -48,9 +49,16 @@ const createBadge = async (req, res) => {
 // @access  Public
 const getBadges = async (req, res) => {
     try {
+        const cachedKey = 'allBadges';
+        const cachedBadges = await redis.get(cachedKey);
+        if (cachedBadges) {
+            return res.json({ badges: JSON.parse(cachedBadges) });
+        }
         const badges = await Badge.find({})
-            .select('-__v')
+            .select('-__v -createdAt -updatedAt')
             .sort({ points: -1 }); // Highest points first
+
+        await redis.set(cachedKey, JSON.stringify(badges), 'EX', 3600); // Cache for 1 hour
 
         res.json({
             badges
@@ -233,6 +241,11 @@ const assignBadgeToStudent = async (req, res) => {
             console.error('Error updating leaderboard:', leaderboardError);
         }
 
+        const studentCached = `studentDashboardData:${studentId}`
+        const notificationCachedKey = `notification:${studentId}`;
+        await redis.del(studentCached);
+        await redis.del(notificationCachedKey);
+
         res.json({
             success: true,
             message: `Badge "${badge.name}" assigned to ${student.name} successfully (+${badge.points} points)`,
@@ -322,6 +335,11 @@ const removeBadgeFromStudent = async (req, res) => {
         } catch (leaderboardError) {
             console.error('Error updating leaderboard:', leaderboardError);
         }
+
+        const studentCached = `studentDashboardData:${studentId}`
+        const notificationCachedKey = `notification:${studentId}`;
+        await redis.del(studentCached);
+        await redis.del(notificationCachedKey);
 
         res.json({
             success: true,

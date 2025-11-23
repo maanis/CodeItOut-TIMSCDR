@@ -34,6 +34,7 @@ import AdminContestResults from "./pages/admin/AdminContestResults";
 import Logs from "./pages/admin/Logs";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
+import Index from "./components/homePage";
 
 const queryClient = new QueryClient();
 
@@ -59,7 +60,8 @@ const App = () => (
                         <Sonner />
                         <BrowserRouter>
                             <Routes>
-                                <Route path="/" element={<Login />} />
+                                <Route path="/" element={<Index />} />
+                                <Route path="/login" element={<Login />} />
                                 <Route path="/register" element={<Register />} />
                                 <Route path="/contests/:id/waiting" element={<ContestWaitingRoom />} />
                                 <Route path="/contests/:id/take" element={<TakeContest />} />
