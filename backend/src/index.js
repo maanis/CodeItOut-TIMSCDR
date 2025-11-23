@@ -33,6 +33,8 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const quizRoutes = require('./routes/quizRoutes');
 const logsRoutes = require('./routes/logsRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const leaderboardRoutes = require('./routes/leaderboardRoutes');
+const { rebuildLeaderboard } = require('./controllers/leaderboardController');
 
 const app = express();
 
@@ -80,6 +82,7 @@ app.use('/api/quizzes', quizRoutes);
 app.use('/api/contests', quizRoutes);
 app.use('/api/logs', logsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/leaderboard', leaderboardRoutes);
 
 // Initialize email service
 initializeEmailService();
@@ -87,8 +90,45 @@ initializeEmailService();
 // Connect to DB
 connectDB();
 
+// Initialize leaderboard on startup
+const initializeLeaderboard = async () => {
+    try {
+        const redisLeaderboardCount = await redis.zcard('leaderboard:students');
+        if (redisLeaderboardCount === 0) {
+            logger.info('Leaderboard is empty, rebuilding from database...');
+            // We need to use the rebuildLeaderboard controller logic
+            const Student = require('./models/Student');
+            const Badge = require('./models/Badge');
+            const Project = require('./models/Project');
+
+            const students = await Student.find().select('_id name email totalPoints avatar');
+
+            if (students.length > 0) {
+                for (const student of students) {
+                    try {
+                        const [badgesCount, projectsCount] = await Promise.all([
+                            Badge.countDocuments({ earnedBy: student._id }),
+                            Project.countDocuments({ studentId: student._id })
+                        ]);
+
+                        await redis.zadd('leaderboard:students', student.totalPoints || 0, student._id.toString());
+                        await redis.hset(`leaderboard:student:${student._id.toString()}`, 'name', student.name, 'email', student.email, 'badgesCount', badgesCount, 'projectsCount', projectsCount, 'avatar', student.avatar || '');
+                    } catch (err) {
+                        logger.error(`Error initializing student ${student._id}:`, err);
+                    }
+                }
+                logger.info(`Leaderboard initialized with ${students.length} students`);
+            }
+        }
+    } catch (error) {
+        logger.error('Error initializing leaderboard:', error);
+    }
+};
+
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     logger.info(`Server running on port ${PORT}`);
+    // Initialize leaderboard after server starts and DB is connected
+    await initializeLeaderboard();
 });

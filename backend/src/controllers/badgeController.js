@@ -183,6 +183,11 @@ const assignBadgeToStudent = async (req, res) => {
             return res.status(404).json({ error: 'Badge not found' });
         }
 
+        // Validate badge points
+        if (badge.points === undefined || badge.points === null || badge.points < 0) {
+            return res.status(400).json({ error: 'Badge has invalid points value' });
+        }
+
         // Check if student exists
         const student = await Student.findById(studentId);
         if (!student) {
@@ -194,11 +199,20 @@ const assignBadgeToStudent = async (req, res) => {
             return res.status(400).json({ error: 'Student already has this badge' });
         }
 
-        // Add badge to student
-        await Student.findByIdAndUpdate(
+        // Add badge to student and update totalPoints atomically
+        const updatedStudent = await Student.findByIdAndUpdate(
             studentId,
-            { $addToSet: { badges: badgeId } }
+            {
+                $addToSet: { badges: badgeId },
+                $inc: { totalPoints: badge.points }
+            },
+            { new: true, runValidators: true }
         );
+
+        // Validate totalPoints is not negative
+        if (updatedStudent.totalPoints < 0) {
+            return res.status(400).json({ error: 'Total points cannot be negative' });
+        }
 
         // Create notification for badge assignment
         try {
@@ -211,13 +225,32 @@ const assignBadgeToStudent = async (req, res) => {
             console.error('Error creating badge notification:', notificationError);
         }
 
+        // Update leaderboard for this student
+        try {
+            const axios = require('axios');
+            await axios.post(`${process.env.API_URL || 'http://localhost:5000'}/api/leaderboard/update/${studentId}`);
+        } catch (leaderboardError) {
+            console.error('Error updating leaderboard:', leaderboardError);
+        }
+
         res.json({
-            message: `Badge "${badge.name}" assigned to ${student.name} successfully`
+            success: true,
+            message: `Badge "${badge.name}" assigned to ${student.name} successfully (+${badge.points} points)`,
+            data: {
+                studentId: updatedStudent._id,
+                studentName: updatedStudent.name,
+                badgeName: badge.name,
+                badgePoints: badge.points,
+                newTotalPoints: updatedStudent.totalPoints
+            }
         });
     } catch (error) {
         console.error('Assign badge error:', error);
         if (error.name === 'CastError') {
             return res.status(400).json({ error: 'Invalid badge or student ID' });
+        }
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ error: 'Validation failed: ' + Object.values(error.errors).map(e => e.message).join(', ') });
         }
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -241,6 +274,11 @@ const removeBadgeFromStudent = async (req, res) => {
             return res.status(404).json({ error: 'Badge not found' });
         }
 
+        // Validate badge points
+        if (badge.points === undefined || badge.points === null || badge.points < 0) {
+            return res.status(400).json({ error: 'Badge has invalid points value' });
+        }
+
         // Check if student exists
         const student = await Student.findById(studentId);
         if (!student) {
@@ -252,19 +290,57 @@ const removeBadgeFromStudent = async (req, res) => {
             return res.status(400).json({ error: 'Student does not have this badge' });
         }
 
-        // Remove badge from student
-        await Student.findByIdAndUpdate(
+        // Validate that removing points won't make totalPoints negative
+        const pointsAfterRemoval = student.totalPoints - badge.points;
+        if (pointsAfterRemoval < 0) {
+            return res.status(400).json({
+                error: 'Cannot remove badge: would result in negative total points',
+                currentPoints: student.totalPoints,
+                badgePoints: badge.points
+            });
+        }
+
+        // Remove badge from student and update totalPoints atomically
+        const updatedStudent = await Student.findByIdAndUpdate(
             studentId,
-            { $pull: { badges: badgeId } }
+            {
+                $pull: { badges: badgeId },
+                $inc: { totalPoints: -badge.points }
+            },
+            { new: true, runValidators: true }
         );
 
+        // Final validation
+        if (updatedStudent.totalPoints < 0) {
+            return res.status(400).json({ error: 'Total points cannot be negative' });
+        }
+
+        // Update leaderboard for this student
+        try {
+            const axios = require('axios');
+            await axios.post(`${process.env.API_URL || 'http://localhost:5000'}/api/leaderboard/update/${studentId}`);
+        } catch (leaderboardError) {
+            console.error('Error updating leaderboard:', leaderboardError);
+        }
+
         res.json({
-            message: `Badge "${badge.name}" removed from ${student.name} successfully`
+            success: true,
+            message: `Badge "${badge.name}" removed from ${student.name} successfully (-${badge.points} points)`,
+            data: {
+                studentId: updatedStudent._id,
+                studentName: updatedStudent.name,
+                badgeName: badge.name,
+                badgePoints: badge.points,
+                newTotalPoints: updatedStudent.totalPoints
+            }
         });
     } catch (error) {
         console.error('Remove badge error:', error);
         if (error.name === 'CastError') {
             return res.status(400).json({ error: 'Invalid badge or student ID' });
+        }
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ error: 'Validation failed: ' + Object.values(error.errors).map(e => e.message).join(', ') });
         }
         res.status(500).json({ error: 'Internal server error' });
     }

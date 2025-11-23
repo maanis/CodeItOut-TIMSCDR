@@ -1,35 +1,20 @@
-import { useMemo } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Trophy, Medal, Award, Star } from 'lucide-react';
+import { Trophy, Medal, Award, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useStudents } from '@/hooks/useStudents';
+import { Button } from '@/components/ui/button';
+import { useLeaderboard } from '@/hooks/useLeaderboard';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const Leaderboard = () => {
-    const { data: students = [], isLoading } = useStudents();
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
 
-    // Calculate leaderboard from real student data
-    const leaderboard = useMemo(() => {
-        if (!students.length) return [];
-
-        return students
-            .map(student => ({
-                id: student.id,
-                name: student.name,
-                avatar: student.avatarUrl ? `${API_BASE_URL}${student.avatarUrl}` : `https://api.dicebear.com/7.x/avataaars/svg?seed=${student.name}`,
-                points: student.badges?.reduce((sum, badge) => sum + (badge?.points || 0), 0) || 0,
-                approvedProjects: student.projects?.length || 0,
-                badgesCount: student.badges?.length || 0
-            }))
-            .sort((a, b) => b.points - a.points)
-            .map((student, index) => ({
-                ...student,
-                rank: index + 1
-            }));
-    }, [students]);
+    const { data: leaderboardResponse = {}, isLoading, error } = useLeaderboard(page, limit);
+    const { data: leaderboard = [], pagination = {} } = leaderboardResponse;
 
     const getRankIcon = (rank) => {
         switch (rank) {
@@ -49,6 +34,9 @@ const Leaderboard = () => {
         }
     };
 
+    // Get top 3 for podium display (always from page 1)
+    const topThree = leaderboard.slice(0, 3);
+
     return (
         <div className="space-y-8 max-w-6xl mx-auto">
             {/* Header */}
@@ -65,7 +53,7 @@ const Leaderboard = () => {
             </motion.div>
 
             {/* Top 3 Podium */}
-            {leaderboard.length >= 3 && (
+            {topThree.length >= 3 && (
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -87,13 +75,13 @@ const Leaderboard = () => {
                             </div>
                             <CardContent className="pt-8">
                                 <Avatar className="w-20 h-20 mx-auto mb-4">
-                                    <AvatarImage src={leaderboard[1]?.avatar} />
-                                    <AvatarFallback className="text-xl">{leaderboard[1]?.name.charAt(0)}</AvatarFallback>
+                                    <AvatarImage src={topThree[1]?.avatar} />
+                                    <AvatarFallback className="text-xl">{topThree[1]?.name?.charAt(0)}</AvatarFallback>
                                 </Avatar>
-                                <h3 className="text-xl font-bold mb-2">{leaderboard[1]?.name}</h3>
+                                <h3 className="text-xl font-bold mb-2">{topThree[1]?.name}</h3>
                                 <div className="space-y-1 text-sm text-muted-foreground">
-                                    <p className="font-semibold text-lg text-primary">{leaderboard[1]?.points} points</p>
-                                    <p>{leaderboard[1]?.badgesCount} badges • {leaderboard[1]?.approvedProjects} projects</p>
+                                    <p className="font-semibold text-lg text-primary">{topThree[1]?.points} points</p>
+                                    <p>{topThree[1]?.badgesCount} badges • {topThree[1]?.projectsCount} projects</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -114,13 +102,13 @@ const Leaderboard = () => {
                             </div>
                             <CardContent className="pt-10">
                                 <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-yellow-400/30">
-                                    <AvatarImage src={leaderboard[0]?.avatar} />
-                                    <AvatarFallback className="text-2xl">{leaderboard[0]?.name.charAt(0)}</AvatarFallback>
+                                    <AvatarImage src={topThree[0]?.avatar} />
+                                    <AvatarFallback className="text-2xl">{topThree[0]?.name?.charAt(0)}</AvatarFallback>
                                 </Avatar>
-                                <h3 className="text-2xl font-bold mb-2">{leaderboard[0]?.name}</h3>
+                                <h3 className="text-2xl font-bold mb-2">{topThree[0]?.name}</h3>
                                 <div className="space-y-1 text-sm text-muted-foreground">
-                                    <p className="font-semibold text-xl text-primary">{leaderboard[0]?.points} points</p>
-                                    <p>{leaderboard[0]?.badgesCount} badges • {leaderboard[0]?.approvedProjects} projects</p>
+                                    <p className="font-semibold text-xl text-primary">{topThree[0]?.points} points</p>
+                                    <p>{topThree[0]?.badgesCount} badges • {topThree[0]?.projectsCount} projects</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -141,13 +129,13 @@ const Leaderboard = () => {
                             </div>
                             <CardContent className="pt-8">
                                 <Avatar className="w-20 h-20 mx-auto mb-4">
-                                    <AvatarImage src={leaderboard[2]?.avatar} />
-                                    <AvatarFallback className="text-xl">{leaderboard[2]?.name.charAt(0)}</AvatarFallback>
+                                    <AvatarImage src={topThree[2]?.avatar} />
+                                    <AvatarFallback className="text-xl">{topThree[2]?.name?.charAt(0)}</AvatarFallback>
                                 </Avatar>
-                                <h3 className="text-xl font-bold mb-2">{leaderboard[2]?.name}</h3>
+                                <h3 className="text-xl font-bold mb-2">{topThree[2]?.name}</h3>
                                 <div className="space-y-1 text-sm text-muted-foreground">
-                                    <p className="font-semibold text-lg text-primary">{leaderboard[2]?.points} points</p>
-                                    <p>{leaderboard[2]?.badgesCount} badges • {leaderboard[2]?.approvedProjects} projects</p>
+                                    <p className="font-semibold text-lg text-primary">{topThree[2]?.points} points</p>
+                                    <p>{topThree[2]?.badgesCount} badges • {topThree[2]?.projectsCount} projects</p>
                                 </div>
                             </CardContent>
                         </Card>
@@ -160,13 +148,13 @@ const Leaderboard = () => {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <Star className="w-5 h-5" />
-                        Full Rankings
+                        Full Rankings - Page {page}
                     </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     {isLoading ? (
                         // Loading skeleton
-                        Array.from({ length: 7 }).map((_, index) => (
+                        Array.from({ length: limit }).map((_, index) => (
                             <motion.div
                                 key={index}
                                 initial={{ opacity: 0, x: -20 }}
@@ -183,6 +171,12 @@ const Leaderboard = () => {
                                 <div className="w-16 h-6 bg-muted rounded animate-pulse"></div>
                             </motion.div>
                         ))
+                    ) : error ? (
+                        <div className="text-center py-12">
+                            <Trophy className="w-16 h-16 mx-auto text-destructive mb-4" />
+                            <h3 className="text-xl font-semibold mb-2">Error Loading Leaderboard</h3>
+                            <p className="text-muted-foreground">Failed to fetch leaderboard data. Please try again.</p>
+                        </div>
                     ) : leaderboard.length === 0 ? (
                         <div className="text-center py-12">
                             <Trophy className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
@@ -192,11 +186,11 @@ const Leaderboard = () => {
                     ) : (
                         leaderboard.map((entry, index) => (
                             <motion.div
-                                key={entry.id}
+                                key={entry.studentId}
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.05 }}
-                                className={`flex items-center gap-4 p-4 rounded-lg hover:bg-secondary/50 transition-colors ${index < 3 ? 'bg-secondary/30' : ''
+                                className={`flex items-center gap-4 p-4 rounded-lg hover:bg-secondary/50 transition-colors ${entry.rank <= 3 ? 'bg-secondary/30' : ''
                                     }`}
                             >
                                 <div className={`w-12 h-12 rounded-full  ${getRankColor(entry.rank)} flex items-center justify-center text-white font-bold`}>
@@ -204,13 +198,13 @@ const Leaderboard = () => {
                                 </div>
                                 <Avatar className="w-12 h-12">
                                     <AvatarImage src={entry.avatar} />
-                                    <AvatarFallback>{entry.name.charAt(0)}</AvatarFallback>
+                                    <AvatarFallback>{entry.name?.charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
                                     <h4 className="font-semibold">{entry.name}</h4>
                                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                                         <span>{entry.badgesCount} badges</span>
-                                        <span>{entry.approvedProjects} projects</span>
+                                        <span>{entry.projectsCount} projects</span>
                                     </div>
                                 </div>
                                 <div className="text-right">
@@ -219,6 +213,51 @@ const Leaderboard = () => {
                                 </div>
                             </motion.div>
                         ))
+                    )}
+
+                    {/* Pagination Controls */}
+                    {pagination.totalPages > 1 && (
+                        <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
+                            <p className="text-sm text-muted-foreground">
+                                Showing {(page - 1) * limit + 1} to {Math.min(page * limit, pagination.totalItems)} of {pagination.totalItems} students
+                            </p>
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1 || isLoading}
+                                >
+                                    <ChevronLeft className="w-4 h-4" />
+                                    Previous
+                                </Button>
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: Math.min(5, pagination.totalPages) }).map((_, i) => {
+                                        const pageNum = i + 1;
+                                        return (
+                                            <Button
+                                                key={pageNum}
+                                                variant={page === pageNum ? 'default' : 'ghost'}
+                                                size="sm"
+                                                onClick={() => setPage(pageNum)}
+                                            >
+                                                {pageNum}
+                                            </Button>
+                                        );
+                                    })}
+                                    {pagination.totalPages > 5 && <span className="text-muted-foreground">...</span>}
+                                </div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPage(p => Math.min(pagination.totalPages, p + 1))}
+                                    disabled={page === pagination.totalPages || isLoading}
+                                >
+                                    Next
+                                    <ChevronRight className="w-4 h-4" />
+                                </Button>
+                            </div>
+                        </div>
                     )}
                 </CardContent>
             </Card>

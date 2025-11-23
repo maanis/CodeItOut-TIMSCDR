@@ -1138,3 +1138,91 @@
 {"level":30,"time":1763881904318,"pid":17396,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from cache"}
 {"level":30,"time":1763881943533,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
 {"level":30,"time":1763881960827,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763882031406,"pid":17396,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763882118311,"pid":16432,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882121244,"pid":16432,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882130413,"pid":16432,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763882423787,"pid":19972,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882426742,"pid":19972,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882440400,"pid":14008,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882443479,"pid":14008,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882855989,"pid":9488,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882858885,"pid":9488,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882890311,"pid":9488,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763882932305,"pid":23096,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882935267,"pid":23096,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882937788,"pid":16784,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882942545,"pid":18492,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882947013,"pid":18360,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882949032,"pid":18360,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882952799,"pid":9560,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882955716,"pid":9560,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882958591,"pid":15756,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763882961774,"pid":15756,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763882964439,"pid":15756,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763882998394,"pid":16988,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883002512,"pid":23420,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883005673,"pid":23420,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883012435,"pid":23420,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763883074144,"pid":15092,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883076988,"pid":15092,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883082197,"pid":15600,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883082293,"pid":15600,"hostname":"Manishj-PC","msg":"Leaderboard is empty, rebuilding from database..."}
+{"level":30,"time":1763883082333,"pid":15600,"hostname":"Manishj-PC","msg":"Leaderboard initialized with 5 students"}
+{"level":30,"time":1763883085111,"pid":15600,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883088580,"pid":10792,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883091432,"pid":10792,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883113321,"pid":10792,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763883252893,"pid":13168,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883255989,"pid":13168,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883271743,"pid":16668,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883274628,"pid":16668,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883280094,"pid":19032,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883283033,"pid":19032,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883287952,"pid":4376,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883290948,"pid":4376,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883391498,"pid":4376,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763883408615,"pid":4376,"hostname":"Manishj-PC","msg":"Teacher logged in: admin@timscdr.com"}
+{"level":30,"time":1763883408774,"pid":4376,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763883444920,"pid":4376,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763883541860,"pid":17500,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883545045,"pid":15472,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883549867,"pid":19472,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883558770,"pid":19472,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883638062,"pid":19472,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763883641042,"pid":19472,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from DB and cached"}
+{"level":30,"time":1763883646441,"pid":19472,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763883882973,"pid":7840,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883886102,"pid":7840,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883896141,"pid":20936,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763883899533,"pid":20936,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763883975716,"pid":20936,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763884172233,"pid":14556,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884175586,"pid":5072,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884178653,"pid":20776,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884181641,"pid":20776,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884186842,"pid":20776,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763884268752,"pid":16460,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884273939,"pid":19620,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884277010,"pid":19620,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884278480,"pid":19620,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763884324202,"pid":16972,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884327018,"pid":16972,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884337509,"pid":7844,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884340523,"pid":7844,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884427709,"pid":7844,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 6902ef898deeed2b9c90bc60"}
+{"level":30,"time":1763884439749,"pid":13344,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884442821,"pid":13344,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884462790,"pid":16368,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884465813,"pid":16368,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884570724,"pid":21852,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884573761,"pid":21852,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884588049,"pid":1712,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884591092,"pid":1712,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884632395,"pid":22888,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
+{"level":30,"time":1763884635364,"pid":22888,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763884649821,"pid":22888,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763884653795,"pid":22888,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763884666925,"pid":22888,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763884680067,"pid":22888,"hostname":"Manishj-PC","msg":"Notifications retrieved from cache for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763884717335,"pid":11216,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
