@@ -30,10 +30,10 @@ const Navigation = () => {
             name: "Testimonials",
             link: "#testimonials",
         },
-        {
-            name: "Contact",
-            link: "#contact",
-        },
+        // {
+        //     name: "Contact",
+        //     link: "#contact",
+        // },
     ];
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -44,9 +44,9 @@ const Navigation = () => {
             <NavBody>
                 <NavbarLogo />
                 <NavItems items={navItems} />
-                <div className="flex items-center gap-4">
+                <div onClick={() => alert('hey')} className="flex pointer-events-auto items-center gap-4">
                     <ThemeToggle />
-                    <NavbarButton variant="primary">Join the Committee</NavbarButton>
+                    <NavbarButton onClick={() => alert('hey')} variant="primary">Join Now</NavbarButton>
                 </div>
             </NavBody>
 
@@ -83,7 +83,7 @@ const Navigation = () => {
                             variant="primary"
                             className="w-full"
                         >
-                            Join the Committee
+                            Join Now
                         </NavbarButton>
                     </div>
                 </MobileNavMenu>

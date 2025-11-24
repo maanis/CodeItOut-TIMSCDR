@@ -1386,3 +1386,7 @@
 {"level":30,"time":1763904494348,"pid":17668,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from cache"}
 {"level":30,"time":1763905991896,"pid":21952,"hostname":"Manishj-PC","msg":"Server running on port 5000"}
 {"level":30,"time":1763905995922,"pid":21952,"hostname":"Manishj-PC","msg":"✓ Email service initialized successfully"}
+{"level":30,"time":1763917090341,"pid":21952,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}
+{"level":30,"time":1763917113622,"pid":21952,"hostname":"Manishj-PC","msg":"Quizzes (page 1) served from DB and cached"}
+{"level":30,"time":1763918153618,"pid":21952,"hostname":"Manishj-PC","msg":"Student logged in: manishjha962@gmail.com"}
+{"level":30,"time":1763918153723,"pid":21952,"hostname":"Manishj-PC","msg":"Notifications retrieved from database for user 69033b2e4ed2af41f578327f"}

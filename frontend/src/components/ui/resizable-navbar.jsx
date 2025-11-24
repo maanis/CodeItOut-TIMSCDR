@@ -163,8 +163,8 @@ export const NavbarLogo = () => {
       href="#"
       className="relative z-20 mr-4 flex items-center space-x-2 px-2 py-1 text-sm"
     >
-      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg">
-        T
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+        <img src="/logo.png" alt="logo" />
       </div>
       <span className="font-medium text-black dark:text-white">TIMSCDR</span>
     </a>

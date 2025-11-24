@@ -37,6 +37,8 @@ import Logs from "./pages/admin/Logs";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import Index from "./components/homePage";
+import ProblemsListPage from "./components/InterviewPrep/pages/ProblemsListPage";
+import ProblemDetailPage from "./components/InterviewPrep/data/ProblemDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +65,8 @@ const App = () => (
                         <BrowserRouter>
                             <Routes>
                                 <Route path="/" element={<Index />} />
+                                <Route path="/problems" element={<ProblemsListPage />} />
+                                <Route path="/problem/:id" element={<ProblemDetailPage />} />
                                 <Route path="/testLogin" element={<TestLogin />} />
                                 <Route path="/testRegister" element={<TestRegister />} />
                                 <Route path="/login" element={<Login />} />
