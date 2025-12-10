@@ -25,7 +25,7 @@ const LogoStrip = () => {
     const duplicatedLogos = [...logos, ...logos];
 
     return (
-        <section className="py-12 border-y dark:bg-neutral-900 border-white/5 overflow-hidden">
+        <section className="py-12 border-y dark:bg-gradient-to-b dark:from-neutral-900 dark:to-neutral-950 border-white/5 overflow-hidden">
             <div className="container mx-auto px-6 relative">
 
                 {/* Gradient Mask for fading edges */}

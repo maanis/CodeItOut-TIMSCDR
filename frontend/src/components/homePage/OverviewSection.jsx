@@ -25,6 +25,7 @@ const cardVariants = {
 const OverviewSection = () => {
     return (
         <section className="py-20 dark:bg-gradient-to-b dark:from-neutral-950 dark:to-neutral-900 relative">
+
             <div className="container mx-auto px-6">
                 <motion.div
                     className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
