@@ -50,9 +50,9 @@ const leaderboardData = [
 
 const LeaderboardSection = () => {
     return (
-        <section id="leaderboard" className="relative py-32 overflow-hidden">
+        <section id="leaderboard" className="relative py-32  overflow-hidden">
             {/* Background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/30 to-background" />
+            <div className="absolute inset-0 dark:bg-gradient-to-b dark:from-neutral-950 dark:to-neutral-900" />
 
             <div className="container mx-auto px-6 relative z-10">
                 {/* Section Header */}

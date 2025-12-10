@@ -37,7 +37,7 @@ const TestimonialsSection = () => {
     ];
 
     return (
-        <section className="py-20 relative">
+        <section className="py-20 dark:bg-gradient-to-b dark:from-neutral-900 dark:to-neutral-950 relative">
             <div className="container mx-auto px-6">
                 <div className="text-center mb-16">
                     <h2 className="text-4xl md:text-5xl font-bold mb-4">What our members say</h2>

@@ -38,7 +38,8 @@ import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 import Index from "./components/homePage";
 import ProblemsListPage from "./components/InterviewPrep/pages/ProblemsListPage";
-import ProblemDetailPage from "./components/InterviewPrep/data/ProblemDetailPage";
+import ProblemDetailPage from "./components/InterviewPrep/pages/ProblemDetailPage";
+// import ProblemDetailPage from "./components/InterviewPrep/data/ProblemDetailPage";
 
 const queryClient = new QueryClient();
 

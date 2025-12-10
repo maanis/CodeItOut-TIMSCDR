@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { CodeEditor } from "../components/CodeEditor";
 import { Navbar } from "../components/Navbar";
-import { problems } from "./problems";
+// import { problems } from "./problems";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -34,6 +34,7 @@ import {
     ResizableHandle,
 } from "@/components/ui/resizable";
 import { TestResultsPanel } from "../components/TestResultsPanel";
+import { problems } from "../data/problems";
 
 export default function ProblemDetailPage() {
     const { id } = useParams();
