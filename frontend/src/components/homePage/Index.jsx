@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import Navigation from "./Navigation";
 import HeroSection from "./HeroSection";
 import SmoothScroll from "./SmoothScroll";
+import CoreTeam from "./CoreTeam";
 
 // Lazy load components that are below the fold
 const OverviewSection = lazy(() => import("./OverviewSection"));
@@ -25,59 +26,59 @@ const Index = () => {
         <>
             {/* Main navigation - always loaded */}
             <Navigation />
-            {/* <SmoothScroll> */}
-            <div className="gradient-bg min-h-screen text-foreground">
-                {/* Hero section - always loaded (above the fold) */}
-                <div id="home">
-                    <HeroSection />
+            <SmoothScroll>
+                <div className="gradient-bg min-h-screen text-foreground">
+                    {/* Hero section - always loaded (above the fold) */}
+                    <div id="home">
+                        <HeroSection />
+                    </div>
+
+                    {/* Lazy loaded sections below the fold */}
+                    <Suspense fallback={<SectionFallback />}>
+                        <div id="overview">
+                            <OverviewSection />
+                        </div>
+                    </Suspense>
+
+                    <Suspense fallback={null}>
+                        <LogoStrip />
+                    </Suspense>
+
+                    <Suspense fallback={<SectionFallback />}>
+                        <div id="features">
+                            <FeaturesSection />
+                        </div>
+                    </Suspense>
+
+                    <Suspense fallback={<SectionFallback />}>
+                        <div id="process">
+                            <ProcessSection />
+                        </div>
+                    </Suspense>
+
+                    <Suspense fallback={<SectionFallback />}>
+                        <div id="leaderboard">
+                            <LeaderboardSection />
+                        </div>
+                    </Suspense>
+
+                    <Suspense fallback={<SectionFallback />}>
+                        <div id="testimonials">
+                            <TestimonialsSection />
+                        </div>
+                    </Suspense>
+
+                    <Suspense fallback={<SectionFallback />}>
+                        <div id="contact">
+                            <CTASection />
+                        </div>
+                    </Suspense>
+
+                    {/* <Suspense fallback={null}> */}
+                    <Footer />
+                    {/* </Suspense> */}
                 </div>
-
-                {/* Lazy loaded sections below the fold */}
-                <Suspense fallback={<SectionFallback />}>
-                    <div id="overview">
-                        <OverviewSection />
-                    </div>
-                </Suspense>
-
-                <Suspense fallback={null}>
-                    <LogoStrip />
-                </Suspense>
-
-                <Suspense fallback={<SectionFallback />}>
-                    <div id="features">
-                        <FeaturesSection />
-                    </div>
-                </Suspense>
-
-                <Suspense fallback={<SectionFallback />}>
-                    <div id="process">
-                        <ProcessSection />
-                    </div>
-                </Suspense>
-
-                <Suspense fallback={<SectionFallback />}>
-                    <div id="leaderboard">
-                        <LeaderboardSection />
-                    </div>
-                </Suspense>
-
-                <Suspense fallback={<SectionFallback />}>
-                    <div id="testimonials">
-                        <TestimonialsSection />
-                    </div>
-                </Suspense>
-
-                <Suspense fallback={<SectionFallback />}>
-                    <div id="contact">
-                        <CTASection />
-                    </div>
-                </Suspense>
-
-                {/* <Suspense fallback={null}> */}
-                <Footer />
-                {/* </Suspense> */}
-            </div>
-            {/* </SmoothScroll> */}
+            </SmoothScroll>
         </>
     );
 };

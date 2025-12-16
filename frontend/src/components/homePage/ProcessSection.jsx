@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import CoreTeam from "./CoreTeam";
 // import developerChar from "@/assets/developer-character.png";
 
 const ProcessSection = () => {
@@ -11,7 +12,7 @@ const ProcessSection = () => {
 
     return (
         <section className="py-20 dark:bg-neutral-950 relative">
-            <div className="container mx-auto px-6">
+            <div className="container space-y-20 mx-auto px-6">
                 <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
                     <div className="glass-card rounded-3xl p-8 lg:p-12 animate-scale-in">
                         <img
@@ -46,6 +47,7 @@ const ProcessSection = () => {
                         </div>
                     </div>
                 </div>
+                <CoreTeam />
             </div>
         </section>
     );
